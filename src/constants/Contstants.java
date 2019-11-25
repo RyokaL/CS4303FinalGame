@@ -1,6 +1,7 @@
-package unitClass;
+package constants;
 
-public final class ClassConstants {
+
+public final class Contstants {
 	
 	public static final int NO_MOUNT = 0;
 	public static final int GROUND_MOUNT = 1;
@@ -14,7 +15,7 @@ public final class ClassConstants {
 	public static final int SPD = 5;
 	public static final int DEX = 6;
 	
-	private ClassConstants() {
+	private Contstants() {
 		throw new IllegalStateException();
 	}
 }

@@ -1,8 +1,8 @@
 package playerUnits;
 
+import constants.Contstants;
 import processing.core.PApplet;
 import processing.core.PVector;
-import unitClass.ClassConstants;
 import unitClass.UnitClass;
 import weapons.Weapon;
 
@@ -27,7 +27,7 @@ public class Unit {
 		this.posY = initPosY;
 		this.assignedClass = assignedClass;
 		this.stats = assignedClass.getBaseStats().clone();
-		this.healthPoints = stats[ClassConstants.HP];
+		this.healthPoints = stats[Contstants.HP];
 		this.level = 1;
 		this.experiencePoints = 0;
 		this.pa = pa;

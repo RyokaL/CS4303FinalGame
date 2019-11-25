@@ -1,0 +1,13 @@
+{
+	"Name" : "Example Class",
+	"SpriteFiles" : ["Resources/ExampleClass/Red.png",
+					"Resources/ExampleClass/Blue.png",
+					"Resources/ExampleClass/Green.png",
+					"Resources/ExampleClass/Yellow.png",
+					"Resources/ExampleClass/Enemy.png"],
+	"StatGrowths" : [25, 25, 25, 25, 25, 10, 10],
+	"Mounted" : 0,
+	"Movement" : 4,
+	"WeaponTypes" : [0],
+	"BaseStats" : [15, 5, 5, 5, 5, 5, 5]
+}
