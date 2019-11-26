@@ -1,13 +1,14 @@
 {
-	"Name" : "Example Class",
-	"SpriteFiles" : ["Resources/ExampleClass/Red.png",
+	"jobName" : "Example Class",
+	"spritePaths" : ["Resources/ExampleClass/Red.png",
 					"Resources/ExampleClass/Blue.png",
 					"Resources/ExampleClass/Green.png",
 					"Resources/ExampleClass/Yellow.png",
 					"Resources/ExampleClass/Enemy.png"],
-	"StatGrowths" : [25, 25, 25, 25, 25, 10, 10],
-	"Mounted" : 0,
-	"Movement" : 4,
-	"WeaponTypes" : [0],
-	"BaseStats" : [15, 5, 5, 5, 5, 5, 5]
+	"statGrowths" : [25, 25, 25, 25, 25, 10, 10],
+	"mounted" : 0,
+	"movement" : 4,
+	"weaponTypes" : [0],
+	"baseStats" : [15, 5, 5, 5, 5, 5, 5],
+	"upgradeList": []
 }

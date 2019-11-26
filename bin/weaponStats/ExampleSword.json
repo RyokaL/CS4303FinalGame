@@ -1,11 +1,11 @@
 {
 	"name" : "Example Sword",
-	"AttackPower" : 5,
-	"HitRate" : 90,
-	"CritRate" : 1,
-	"MaxRange" : 1,
-	"MinRange" : 1,
-	"Durability" : 10,
-	"Healing" : false,
-	"WeaponType" : 0
+	"attack" : 5,
+	"hitRate" : 90,
+	"critRate" : 1,
+	"maxRange" : 1,
+	"minRange" : 1,
+	"durability" : 10,
+	"healing" : false,
+	"weaponType" : 0
 }

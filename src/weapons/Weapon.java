@@ -1,6 +1,6 @@
 package weapons;
 
-public class Weapon {
+public class Weapon implements Cloneable {
 	
 	private String name;
 	private int attack;
@@ -47,5 +47,9 @@ public class Weapon {
 	
 	public boolean isHealing() {
 		return healing;
+	}
+	
+	public Weapon clone() throws CloneNotSupportedException {
+		return (Weapon) super.clone();
 	}
 }

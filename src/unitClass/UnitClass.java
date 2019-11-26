@@ -5,32 +5,35 @@ import processing.core.PImage;
 
 public class UnitClass {
 	
-	private String className;
+	private String jobName;
 	private String[] spritePaths;
-	private PImage[] sprites;
+	private transient PImage[] sprites;
 	private int[] statGrowths;
 	private int mounted;
 	private int movement;
 	private int[] weaponTypes;
 	private int[] baseStats;
-	
+	private String[] upgradeList;
 	//Maybe add abilities?
 	
-	public UnitClass(String name, String[] spriteFilePaths, int[] statGrowths, int mounted, int movement, int[] weaponTypes, final PApplet pa) {
-		this.className = name;
+	public UnitClass(String name, String[] spriteFilePaths, int[] statGrowths, int mounted, int movement, int[] weaponTypes) {
+		this.jobName = name;
 		this.spritePaths = spriteFilePaths;
 		this.statGrowths = statGrowths;
 		this.mounted = mounted;
 		this.movement = movement;
 		this.weaponTypes = weaponTypes;
+	}
+	
+	public void loadSprites( final PApplet pa) {
 		for(int i = 0; i < 4; i++) {
-			sprites[i] = pa.loadImage(spriteFilePaths[i]);
+			//sprites[i] = pa.loadImage(spritePaths[i]);
 		}
 	}
 
 	//Name of the class - e.g. Mage, Dragoon etc.
 	public String getName() {
-		return className;
+		return jobName;
 	}
 	
 	//Sprite to display based on controlling player
@@ -62,5 +65,9 @@ public class UnitClass {
 	
 	public int[] getBaseStats() {
 		return baseStats;
+	}
+	
+	public String[] getUpgradeList() {
+		return upgradeList;
 	}
 }
