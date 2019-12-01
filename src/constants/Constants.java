@@ -1,11 +1,16 @@
 package constants;
 
 
-public final class Contstants {
+public final class Constants {
 	
 	public static final int NO_MOUNT = 0;
 	public static final int GROUND_MOUNT = 1;
 	public static final int FLYING_MOUNT = 2;
+	
+	public static final int AFFECT_ALL = 3;
+	public static final int AFFECT_MOUNTED = 4;
+	public static final int AFFECT_GROUND_UNITS = 5;
+	public static final int NO_UNITS = -1;
 	
 	public static final int HP = 0;
 	public static final int STR = 1;
@@ -23,7 +28,15 @@ public final class Contstants {
 	public static final int HEAL = 5;
 	public static final int BEAST = 6;
 	
-	private Contstants() {
+	public static final int MAX_INVENTORY = 5;
+	
+	public static final int RED = 0;
+	public static final int BLUE = 1;
+	public static final int GREEN = 2;
+	public static final int YELLOW = 3;
+	public static final int ENEMY = 4;
+	
+	private Constants() {
 		throw new IllegalStateException();
 	}
 }
