@@ -1,11 +1,8 @@
 package playerUnits;
 
-import java.util.ArrayList;
-
 import constants.Constants;
 import helpers.Pair;
 import processing.core.PApplet;
-import processing.core.PVector;
 import unitClass.UnitClass;
 import weapons.Weapon;
 
@@ -38,12 +35,15 @@ public class Unit {
 		this.inventory = new Weapon[Constants.MAX_INVENTORY];
 	}
 	
-	public void addExp(int exp) {
+	public int addExp(int exp) {
+		int levels = 0;
 		experiencePoints += exp;
-		if(experiencePoints >= 100) {
+		while(experiencePoints >= 100) {
 			experiencePoints -= 100;
 			levelUp();
+			levels += 1;
 		}
+		return levels;
 	}
 	
 	public void setSpacesNewTurn(Pair[] newSpaces) {
@@ -75,10 +75,28 @@ public class Unit {
 		return stats;
 	}
 	
+	public boolean addToInventory(Weapon toAdd) {
+		if(inventorySize >= Constants.MAX_INVENTORY) {
+			return false;
+		}
+		else {
+			inventory[inventorySize] = toAdd;
+			inventorySize += 1;
+			return true;
+		}
+	}
+	
 	public void takeDamage(int damage) {
 		healthPoints -= damage;
 		if(healthPoints < 0) {
 			healthPoints = 0;
+		}
+	}
+	
+	public void heal(int healing) {
+		healthPoints += healing;
+		if(healthPoints > stats[Constants.HP]) {
+			healthPoints = stats[Constants.HP];
 		}
 	}
 

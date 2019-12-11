@@ -13,6 +13,7 @@ public class UnitClass {
 	private int movement;
 	private int[] weaponTypes;
 	private int[] baseStats;
+	private int upgradeStage;
 	private String[] upgradeList;
 	//Maybe add abilities?
 	
@@ -65,6 +66,10 @@ public class UnitClass {
 	
 	public int[] getBaseStats() {
 		return baseStats;
+	}
+	
+	public int getUpgradeStage() {
+		return upgradeStage;
 	}
 	
 	public String[] getUpgradeList() {

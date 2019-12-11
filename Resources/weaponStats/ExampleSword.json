@@ -7,5 +7,6 @@
 	"minRange" : 1,
 	"durability" : 10,
 	"healing" : false,
-	"weaponType" : 0
+	"weaponType" : 0,
+	"rarity" : 0
 }

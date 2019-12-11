@@ -2,6 +2,8 @@ package constants;
 
 
 public final class Constants {
+	public static final int STATE_MAIN_MENU = 0;
+	public static final int STATE_POST_MAIN = 1;
 	
 	public static final int NO_MOUNT = 0;
 	public static final int GROUND_MOUNT = 1;

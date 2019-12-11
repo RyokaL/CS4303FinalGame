@@ -4,5 +4,7 @@
 	"affectedUnits" : -1,
 	"unitsCanOccupy" : 3,
 	"heal" : false,
-	"healPercent" : 0
+	"healPercent" : 0,
+	"trap" : false,
+	"damagePercent" : 0
 }

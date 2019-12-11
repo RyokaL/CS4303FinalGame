@@ -12,6 +12,8 @@ public class Tile {
 	private int unitsCanOccupy;
 	private boolean heal;
 	private int healPercent;
+	private boolean trap;
+	private int damagePercent;
 	
 	private transient String tileDetail = null;
 	
@@ -27,6 +29,22 @@ public class Tile {
 	}
 	public String getName() {
 		return name;
+	}
+	
+	public boolean isHealing() {
+		return heal;
+	}
+	
+	public int getHealPercent() {
+		return healPercent;
+	}
+	
+	public boolean isTrap() {
+		return trap;
+	}
+	
+	public int getDamagePercent() {
+		return damagePercent;
 	}
 	
 	public String toString() {
@@ -83,12 +101,17 @@ public class Tile {
 				break;
 		}
 		if(!(affectedUnits == Constants.NO_UNITS)) {
-			details.append(affectMove + "movement");
+			details.append(affectMove + "movement.");
 		}
 		
 		if(heal) {
-			details.append("Units recieve " + healPercent + "% healing");
+			details.append("Units recieve " + healPercent + "% healing.");
 		}
+		
+		if(trap) {
+			details.append("Units take " + damagePercent + "% damage.");
+		}
+		
 		tileDetail = details.toString();
 		return tileDetail;
 	}

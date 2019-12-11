@@ -11,6 +11,7 @@ public class Weapon implements Cloneable {
 	private int durability;
 	private boolean healing;
 	private int weaponType;
+	private int rarity;
 	
 	public Weapon(String name, int attack, int hitRate, int critRate, int maxRange, int minRange, int initDurability, boolean healing, int weaponType) {
 		
@@ -47,6 +48,14 @@ public class Weapon implements Cloneable {
 	
 	public boolean isHealing() {
 		return healing;
+	}
+	
+	public int getWeaponType() {
+		return weaponType;
+	}
+	
+	public int getRarity() {
+		return rarity;
 	}
 	
 	public Weapon clone() throws CloneNotSupportedException {

@@ -21,9 +21,14 @@ public class Map {
 	private transient Tile[] tiles;
 	
 	private int[][] map;
-	private int mapStartPosX;
-	private int mapStartPosY;
-	private int tileSize;
+	private float mapStartPosX;
+	private float mapStartPosY;
+	private float tileSize;
+	
+	private Pair redStartPos;
+	private Pair blueStartPos;
+	private Pair greenStartPos;
+	private Pair yellowStartPos;
 	
 	public Pair[] getAttackSpaces(Unit unitToCheck) {
 		HashSet<Pair> listOfSpaces = new HashSet<Pair>();
@@ -100,6 +105,11 @@ public class Map {
 		return (Pair[])listOfSpace.toArray();
 	}
 	
+	public Tile getTileAtPos(Pair pos) {
+		int mapIndex = map[pos.x][pos.y];
+		return tiles[mapIndex];
+	}
+	
 	public int getTileEffects(Unit unitToCheck, int mapTile) {
 		Tile currTile = tiles[mapTile];
 		int unitMount = unitToCheck.getAssignedClass().getMounted();
@@ -156,16 +166,32 @@ public class Map {
 		return map;
 	}
 
-	public int getMapStartPosX() {
+	public float getMapStartPosX() {
 		return mapStartPosX;
 	}
 
-	public int getMapStartPosY() {
+	public float getMapStartPosY() {
 		return mapStartPosY;
 	}
 
-	public int getTileSize() {
+	public float getTileSize() {
 		return tileSize;
+	}
+
+	public Pair getRedStartPos() {
+		return redStartPos;
+	}
+
+	public Pair getBlueStartPos() {
+		return blueStartPos;
+	}
+
+	public Pair getGreenStartPos() {
+		return greenStartPos;
+	}
+
+	public Pair getYellowStartPos() {
+		return yellowStartPos;
 	}
 
 	public void loadMap(final PApplet pa) {

@@ -1,8 +1,0 @@
-{
-	"name" : "Plains",
-	"affectMove" : 0,
-	"affectedUnits" : -1,
-	"unitsCanOccupy" : 3,
-	"heal" : false,
-	"healPercent" : 0
-}
