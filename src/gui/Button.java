@@ -116,7 +116,7 @@ public class Button {
 			}
 		}
 		else if(useColour) {
-			pa.stroke(0);
+			pa.noStroke();
 			if(mouseOver) {
 				pa.fill(highlightColour);
 			}

@@ -3,6 +3,7 @@ import java.io.IOException;
 
 import constants.Constants;
 import gui.MainMenu;
+import gui.SetUp;
 import map.MapStore;
 import map.TileSetStore;
 import processing.core.PApplet;
@@ -18,7 +19,9 @@ public class DunScaith extends PApplet {
 	private int gameState = Constants.STATE_MAIN_MENU;
 	
 	private MainMenu main;
+	private SetUp setup;
 	
+	private Game activeGame;
 	
 	// The argument passed to main must match the class name
     public static void main(String[] args) {
@@ -49,16 +52,25 @@ public class DunScaith extends PApplet {
 
     //Draw to screen
     public void draw() {
+    	background(0);
     	switch(gameState) {
     		case Constants.STATE_MAIN_MENU:
     			drawMainMenu();
     			break;
     		case Constants.STATE_POST_MAIN:
+    			drawSetupMenu();
+    			break;
+    		case Constants.STATE_GAME:
+    			updateGame();
     			break;
     		default:
     			background(0);
     			break;
     	}
+    }
+    
+    private void updateGame() {
+    	activeGame.update();
     }
     
     private void drawMainMenu() {
@@ -68,7 +80,19 @@ public class DunScaith extends PApplet {
     	main.update();
     }
     
+    private void drawSetupMenu() {
+    	if(setup == null) {
+    		setup = new SetUp(this,this, (maps.getMapNames().toArray(new String[maps.getMapNames().size()])) );
+    	}
+    	setup.update();
+    }
+    
     public void updateState(int newState) {
     	gameState = newState;
+    }
+    
+    public void startGame(boolean[] teams, String mapName, int startTurn) {
+    	activeGame = new Game(maps.getMapObj(mapName), teams[Constants.RED], teams[Constants.BLUE], teams[Constants.GREEN], teams[Constants.YELLOW], startTurn, this, classes);
+    	gameState = Constants.STATE_GAME;
     }
 }
