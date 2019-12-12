@@ -39,6 +39,9 @@ public class ClassStore {
 			
 			//Create stage/strength table
 			int strength = nextClass.getUpgradeStage();
+			if(strength == -1) {
+				continue;
+			}
 			if(maxStrength < strength) {
 				maxStrength = strength;
 			}

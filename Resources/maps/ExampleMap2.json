@@ -1,28 +1,28 @@
 {
 	"name" : "Example Map v2.",
 	"tileNames" : ["Plains"],
-	"mapPath" : "Resources/maps/ExampleMap.png",
+	"mapPath" : "Resources/mapImages/TestMap.png",
 	"map" : [[1,1,1,1],
 			 [1,1,1,1],
 			 [1,1,1,1],
 			 [1,1,1,1]],
 	"mapStartPosX" : 0,
 	"mapStartPosY" : 0,
-	"tileSize" : 10,
+	"tileSize" : 50,
 	"redStartPos" : {
 		"x" : 0,
 		"y" : 0
 	},
 	"blueStartPos" : {
-		"x" : 4,
+		"x" : 3,
 		"y" : 0
 	},
 	"greenStartPos" : {
 		"x" : 0,
-		"y" : 4
+		"y" : 3
 	},
 	"yellowStartPos" : {
-		"x" : 4,
-		"y" : 4
+		"x" : 3,
+		"y" : 3
 	}
 }

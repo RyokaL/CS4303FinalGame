@@ -24,11 +24,13 @@ public class UnitClass {
 		this.mounted = mounted;
 		this.movement = movement;
 		this.weaponTypes = weaponTypes;
+		this.sprites = new PImage[4];
 	}
 	
 	public void loadSprites( final PApplet pa) {
+		this.sprites = new PImage[4];
 		for(int i = 0; i < 4; i++) {
-			//sprites[i] = pa.loadImage(spritePaths[i]);
+			sprites[i] = pa.loadImage(spritePaths[i]);
 		}
 	}
 

@@ -1,14 +1,14 @@
 {
 	"name" : "Example Map",
 	"tileNames" : ["Plains"],
-	"mapPath" : "Resources/maps/TestMap.png",
+	"mapPath" : "Resources/mapImages/TestMap.png",
 	"map" : [[1,1,1,1],
 			 [1,1,1,1],
 			 [1,1,1,1],
-		[1,1,1,1]],
+			 [1,1,1,1]],
 	"mapStartPosX" : 0,
 	"mapStartPosY" : 0,
-	"tileSize" : 10,
+	"tileSize" : 50,
 	"redStartPos" : {
 		"x" : 0,
 		"y" : 0

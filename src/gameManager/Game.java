@@ -5,6 +5,7 @@ import map.Resource;
 import map.Tile;
 import playerUnits.Unit;
 import processing.core.PApplet;
+import processing.core.PImage;
 import unitClass.ClassStore;
 import unitClass.UnitClass;
 
@@ -84,7 +85,10 @@ public class Game {
 				Pair unitPos = u.getPos();
 				float actXPos = map.getMapStartPosX() + (unitPos.x * map.getTileSize());
 				float actYPos = map.getMapStartPosY() + (unitPos.y * map.getTileSize());
-				pa.image(u.getAssignedClass().getSprite(i), actXPos, actYPos);
+				
+				PImage sprite = u.getAssignedClass().getSprite(i);
+				
+				pa.image(sprite, actXPos + sprite.width/4, actYPos + sprite.height/4);
 				
 				//If the unit has moved to a spot with loot, collect it
 				if(loot.containsKey(unitPos)) {
