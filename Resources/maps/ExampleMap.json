@@ -1,7 +1,7 @@
 {
 	"name" : "Example Map",
 	"tileNames" : ["Plains"],
-	"mapPath" : "Resources/maps/ExampleMap.png",
+	"mapPath" : "Resources/maps/TestMap.png",
 	"map" : [[1,1,1,1],
 			 [1,1,1,1],
 			 [1,1,1,1],
