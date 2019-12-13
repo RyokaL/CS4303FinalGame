@@ -56,7 +56,6 @@ public class Game {
 			Unit redPlayer = initUnit(Constants.RED);
 			easyAccessMap[redPlayer.getPos().x][redPlayer.getPos().y] = redPlayer;
 			rTeam = new Player(Constants.RED, redPlayer);
-			System.out.println(rTeam.getUnits());
 		}
 		if(blue) {
 			Unit bluePlayer = initUnit(Constants.BLUE);
@@ -85,14 +84,6 @@ public class Game {
 		
 		enemy = new Player(Constants.ENEMY);
 		teams.add(rTeam); teams.add(bTeam); teams.add(gTeam); teams.add(yTeam); teams.add(enemy);
-		System.out.println(teams);
-		for(Player p : teams) {
-			System.out.println(p);
-			if(p == null) {
-				continue;
-			}
-			System.out.println(p.getUnits());
-		}
 		
 		loot = new HashMap<Pair, Resource>();
 		
