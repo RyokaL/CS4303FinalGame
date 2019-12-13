@@ -1,6 +1,7 @@
 package gameManager;
 
 import helpers.Pair;
+import helpers.Triple;
 import processing.core.PApplet;
 import processing.core.PVector;
 
@@ -38,10 +39,14 @@ public class Camera {
 		return gridPos;
 	}
 	
+	public Triple convertToDrawPos(Pair gridPos) {
+		return new Triple(initActPosX + (gridPos.x * tileSize), initActPosY + (gridPos.y * tileSize), tileSize);
+	}
+	
 	public void drawSelectedGrid() {
 		//TODO: Change these to actual colours
-		pa.stroke(0);
-		pa.fill(0);
+		pa.stroke(255);
+		pa.fill(255);
 		pa.rect(actualPos.x - tileSize / 2, actualPos.y - tileSize / 2, tileSize, tileSize);
 	}
 }

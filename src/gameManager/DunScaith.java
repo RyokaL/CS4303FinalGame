@@ -95,4 +95,40 @@ public class DunScaith extends PApplet {
     	activeGame = new Game(maps.getMapObj(mapName), teams[Constants.RED], teams[Constants.BLUE], teams[Constants.GREEN], teams[Constants.YELLOW], startTurn, this, classes);
     	gameState = Constants.STATE_GAME;
     }
+    
+    public void keyPressed() {
+    	switch(gameState) {
+    		case Constants.STATE_GAME:
+    			if(key == CODED) {
+    				switch(keyCode) {
+    					case LEFT:
+    						activeGame.changeSelectedPos(-1, 0);
+    						break;
+    					case RIGHT:
+    						activeGame.changeSelectedPos(1, 0);
+    						break;
+    					case UP:
+    						activeGame.changeSelectedPos(0, -1);
+    						break;
+    					case DOWN:
+    						activeGame.changeSelectedPos(0, 1);
+    						break;
+        			}
+    			}
+    			else {
+    				switch(key) {
+    					case ' ':
+    						activeGame.selectCurrentPos();
+    						break;
+    					case 'c':
+    						activeGame.cancelSelection();
+    						break;
+    					case 'e':
+    						activeGame.endCurrentTurn();
+    						break;
+    				}
+    			}
+    			break;
+    	}
+    }
 }

@@ -2,6 +2,7 @@ package gameManager;
 
 import java.util.ArrayList;
 
+import helpers.Pair;
 import playerUnits.Unit;
 import weapons.Weapon;
 
@@ -24,6 +25,15 @@ public class Player {
 		this.team = team;
 		this.gold = 0;
 		this.units = new ArrayList<Unit>();
+	}
+	
+	public Unit getUnitAtPos(Pair pos) {
+		for(Unit u : units) {
+			if(u.getPos().equals(pos)) {
+				return u;
+			}
+		}
+		return null;
 	}
 	
 	public boolean isEmpty() {

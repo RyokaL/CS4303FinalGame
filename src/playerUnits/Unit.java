@@ -21,10 +21,12 @@ public class Unit {
 	private int level;
 	private int experiencePoints;
 	private PApplet pa;
+	private int team;
+	private boolean moved = false;
 	
 	private Pair[] moveableSpaces;
 	
-	public Unit(int initPosX, int initPosY, UnitClass assignedClass, final PApplet pa) {
+	public Unit(int initPosX, int initPosY, UnitClass assignedClass, int team, final PApplet pa) {
 		this.pos = new Pair(initPosX, initPosY);
 		this.assignedClass = assignedClass;
 		this.stats = assignedClass.getBaseStats().clone();
@@ -33,6 +35,7 @@ public class Unit {
 		this.experiencePoints = 0;
 		this.pa = pa;
 		this.inventory = new Weapon[Constants.MAX_INVENTORY];
+		this.team = team;
 	}
 	
 	public int addExp(int exp) {
@@ -44,6 +47,23 @@ public class Unit {
 			levels += 1;
 		}
 		return levels;
+	}
+	
+	public int getTeam() {
+		return team;
+	}
+	
+	public boolean hasMoved() {
+		return moved;
+	}
+	
+	public void setMoved(boolean value) {
+		moved = value;
+	}
+	
+	public void setNewPos(int newX, int newY) {
+		pos.x = newX;
+		pos.y = newY;
 	}
 	
 	public void setSpacesNewTurn(Pair[] newSpaces) {
