@@ -7,6 +7,7 @@ import gui.SetUp;
 import map.MapStore;
 import map.TileSetStore;
 import processing.core.PApplet;
+import processing.core.PVector;
 import unitClass.ClassStore;
 import weapons.Blacksmith;
 
@@ -61,7 +62,12 @@ public class DunScaith extends PApplet {
     			drawSetupMenu();
     			break;
     		case Constants.STATE_GAME:
+    			pushMatrix();
+    			PVector gameCamPos = activeGame.getCamera().getTransPos();
+    			translate(gameCamPos.x, gameCamPos.y);
     			updateGame();
+    			popMatrix();
+    			//TOOD: Add UI drawing here (turn etc..)
     			break;
     		default:
     			background(0);
@@ -97,38 +103,6 @@ public class DunScaith extends PApplet {
     }
     
     public void keyPressed() {
-    	switch(gameState) {
-    		case Constants.STATE_GAME:
-    			if(key == CODED) {
-    				switch(keyCode) {
-    					case LEFT:
-    						activeGame.changeSelectedPos(-1, 0);
-    						break;
-    					case RIGHT:
-    						activeGame.changeSelectedPos(1, 0);
-    						break;
-    					case UP:
-    						activeGame.changeSelectedPos(0, -1);
-    						break;
-    					case DOWN:
-    						activeGame.changeSelectedPos(0, 1);
-    						break;
-        			}
-    			}
-    			else {
-    				switch(key) {
-    					case ' ':
-    						activeGame.selectCurrentPos();
-    						break;
-    					case 'c':
-    						activeGame.cancelSelection();
-    						break;
-    					case 'e':
-    						activeGame.endCurrentTurn();
-    						break;
-    				}
-    			}
-    			break;
-    	}
+    	
     }
 }

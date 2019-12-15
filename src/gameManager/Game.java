@@ -5,6 +5,7 @@ import map.Resource;
 import map.Tile;
 import playerUnits.Unit;
 import processing.core.PApplet;
+import processing.core.PConstants;
 import processing.core.PImage;
 import unitClass.ClassStore;
 import unitClass.UnitClass;
@@ -13,6 +14,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 import constants.Constants;
+import gui.BattleMenu;
+import gui.UnitBattleMenu;
 import helpers.Pair;
 import helpers.Triple;
 
@@ -20,6 +23,12 @@ public class Game {
 
 	private Map map;
 	//private int numPlayers;
+	private final int NO_MENU = 0;
+	private final int ACTION_MENU = 1;
+	private final int PLAYER_MENU = 2;
+	
+	private UnitBattleMenu unitMenu = null;
+	private BattleMenu playerMenu = null;
 	
 	private Player rTeam, bTeam, gTeam, yTeam, enemy;
 	private ArrayList<Player> teams = new ArrayList<Player>(5);
@@ -40,6 +49,8 @@ public class Game {
 	
 	private boolean unitSelected;
 	private Unit selectedUnit;
+	
+	private int openMenuState = 0;
 	
 	public Game(Map map, boolean red, boolean blue, boolean green, boolean yellow, int startTurn, final PApplet pa, ClassStore classes) {
 		this.pa = pa;
@@ -104,12 +115,22 @@ public class Game {
 		//Draw selected tile:
 		cam.drawSelectedGrid();
 		
+		//Current turn - move to UI
 		pa.fill(255);
 		pa.text(turn, pa.width/2, pa.height/2);
 		
 		//Check if selected tile is a unit and draw reach:
+		//TODO: Make better :)
 		Unit selected;
-		if((selected = isPosUnit()) != null) {
+		if(unitSelected) {
+			Pair[] toDraw = selectedUnit.getMoveableSpaces();
+			pa.fill(0x441f75ff);
+			for(Pair p : toDraw) {
+				Triple t = cam.convertToDrawPos(p);
+				pa.rect(t.X, t.Y, t.Z, t.Z);
+			}
+		}
+		else if((selected = isPosUnit()) != null) {
 			Pair[] toDraw = map.getMovementSpaces(selected, easyAccessMap);
 			pa.fill(0x441f75ff);
 			for(Pair p : toDraw) {
@@ -126,8 +147,8 @@ public class Game {
 			ArrayList<Unit> currTeamUnits = currTeam.getUnits();
 			for(Unit u : currTeamUnits) {
 				Pair unitPos = u.getPos();
-				float actXPos = map.getMapStartPosX() + (unitPos.x * map.getTileSize());
-				float actYPos = map.getMapStartPosY() + (unitPos.y * map.getTileSize());
+				float actXPos = (unitPos.x * map.getTileSize());
+				float actYPos = (unitPos.y * map.getTileSize());
 				
 				PImage sprite = u.getAssignedClass().getSprite(i);
 				
@@ -145,6 +166,60 @@ public class Game {
 				}
 			}
 		}
+		
+		//Add some sign unit is selected
+		
+		//Draw battle menu if using
+		if(openMenuState == ACTION_MENU && unitMenu != null) {
+			unitMenu.update();
+		}
+		
+		//Draw player menu
+		if(openMenuState == PLAYER_MENU) {
+			playerMenu.update();
+		}
+		
+		//Key input
+		if(pa.keyPressed && openMenuState == NO_MENU) {
+			pa.keyPressed = false;
+			if(pa.key == PConstants.CODED) {
+				switch(pa.keyCode) {
+					case PConstants.LEFT:
+						changeSelectedPos(-1, 0);
+						break;
+					case PConstants.RIGHT:
+						changeSelectedPos(1, 0);
+						break;
+					case PConstants.UP:
+						changeSelectedPos(0, -1);
+						break;
+					case PConstants.DOWN:
+						changeSelectedPos(0, 1);
+						break;
+				}
+			}
+			else {
+				switch(pa.key) {
+					case ' ':
+						selectCurrentPos();
+						break;
+					case 'q':
+						cancelSelection();
+						break;
+					case 'e':
+						playerMenu = new BattleMenu(pa, this, teams.get(turn), cam.getTransPos());
+						openMenuState = PLAYER_MENU;
+						break;
+					case 'a':
+						//Move to previous unmoved unit
+						break;
+					case 'd':
+						//Move to next unmoved unit
+						break;
+				}
+			}
+		}
+		
 	}
 	
 	private void spawnResources() {
@@ -212,7 +287,7 @@ public class Game {
 		
 		for(Unit[] uArray : easyAccessMap) {
 			for(Unit u : uArray) {
-				//Update moveable spaces
+				//Update movable spaces
 				if(u == null) {
 					continue;
 				}
@@ -225,6 +300,9 @@ public class Game {
 			Pair camNewTurnPos = teams.get(turn).getUnits().get(0).getPos();
 			cam.updateGridPos(camNewTurnPos.x, camNewTurnPos.y);
 		}
+		
+		openMenuState = NO_MENU;
+		playerMenu = null;
 		
 		if(turn == startTurn) {
 			//Also update each unit if on a healing tile (or trap)
@@ -307,39 +385,34 @@ public class Game {
 		if(unitSelected) {
 			for(Pair p : selectedUnit.getMoveableSpaces()) {
 				if(currentPos.equals(p)) {
-					//Valid space
-					//Bring up action menu - for now just move
 					if(easyAccessMap[currentPos.x][currentPos.y] != null) {
 						break;
 					}
-					
-					easyAccessMap[selectedUnit.getPos().x][selectedUnit.getPos().y] = null;
-					selectedUnit.setNewPos(currentPos.x, currentPos.y);
-					selectedUnit.setMoved(true);
-					easyAccessMap[selectedUnit.getPos().x][selectedUnit.getPos().y] = selectedUnit;
-					
-					unitSelected = false;
-					selectedUnit = null;
-					
-					//Update everyone's spaces as unit moving may have blocked access
-					for(Unit[] uArray : easyAccessMap) {
-						for(Unit u : uArray) {
-							if(u == null) {
-								continue;
-							}
-							u.setSpacesNewTurn(map.getMovementSpaces(u, easyAccessMap));
-						}
-					}
-					break;
+					//Valid space
+					//Bring up action menu
+					selectedUnit.setMoving(true);
+					selectedUnit.setMovePos(currentPos.x, currentPos.y);
+					unitMenu = new UnitBattleMenu(pa, this, selectedUnit, cam);
+					openMenuState = ACTION_MENU;
 				}
 				
 			}
 		}
 		else {
+			openMenuState = NO_MENU;
+			unitMenu = null;
 			selectedUnit = easyAccessMap[currentPos.x][currentPos.y];
-			if(selectedUnit == null || selectedUnit.hasMoved() || selectedUnit.getTeam() != turn) {
+			if(selectedUnit == null) {
 				selectedUnit = null;
 				unitSelected = false;
+				
+				playerMenu = new BattleMenu(pa, this, teams.get(turn), cam.getTransPos());
+				openMenuState = PLAYER_MENU;
+			}
+			else if(selectedUnit.hasMoved() || selectedUnit.getTeam() != turn) {
+				selectedUnit = null;
+				unitSelected = false;
+				
 			}
 			else {
 				unitSelected = true;
@@ -347,8 +420,33 @@ public class Game {
 		}
 	}
 	
+	public void moveAndUpdateSelection() {
+		Pair currentPos = cam.getSelectedGridPos();
+		selectedUnit.setMoving(false);
+		easyAccessMap[selectedUnit.getPos().x][selectedUnit.getPos().y] = null;
+		selectedUnit.setNewPos(currentPos.x, currentPos.y);
+		selectedUnit.setMoved(true);
+		easyAccessMap[selectedUnit.getPos().x][selectedUnit.getPos().y] = selectedUnit;
+		
+		cancelSelection();
+		
+		//Update everyone's spaces as unit moving may have blocked access
+		for(Unit[] uArray : easyAccessMap) {
+			for(Unit u : uArray) {
+				if(u == null) {
+					continue;
+				}
+				u.setSpacesNewTurn(map.getMovementSpaces(u, easyAccessMap));
+			}
+		}
+	}
+	
 	public void cancelSelection() {
+		selectedUnit.setMoving(false);
+		
 		unitSelected = false;
 		selectedUnit = null;
+		openMenuState = NO_MENU;
+		unitMenu = null;
 	}
 }

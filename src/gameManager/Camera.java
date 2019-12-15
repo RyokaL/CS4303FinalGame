@@ -12,6 +12,8 @@ public class Camera {
 	
 	private float initActPosX, initActPosY;
 	
+	//TODO: Maybe add some default offset for UI elements?
+	
 	private final PApplet pa;
 	
 	public Camera(int initGridX, int initGridY, float tileSize, float initActPosX, float initActPosY, final PApplet pa) {
@@ -35,18 +37,22 @@ public class Camera {
 		return actualPos;
 	}
 	
+	public PVector getTransPos() {
+		return new PVector(-(actualPos.x - tileSize/2), -(actualPos.y - tileSize/2));
+	}
+	
 	public Pair getSelectedGridPos() {
 		return gridPos;
 	}
 	
 	public Triple convertToDrawPos(Pair gridPos) {
-		return new Triple(initActPosX + (gridPos.x * tileSize), initActPosY + (gridPos.y * tileSize), tileSize);
+		return new Triple((gridPos.x * tileSize), (gridPos.y * tileSize), tileSize);
 	}
 	
 	public void drawSelectedGrid() {
 		//TODO: Change these to actual colours
 		pa.stroke(255);
 		pa.fill(255);
-		pa.rect(actualPos.x - tileSize / 2, actualPos.y - tileSize / 2, tileSize, tileSize);
+		pa.rect(actualPos.x - tileSize / 2 - initActPosX, actualPos.y - tileSize / 2 - initActPosY, tileSize, tileSize);
 	}
 }

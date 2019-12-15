@@ -132,4 +132,8 @@ public class Button {
 			pa.text(text, posX + width/2, posY + height/2);
 		}
 	}
+	
+	public void setHighlighted() {
+		mouseOver = !mouseOver;
+	}
 }

@@ -24,6 +24,9 @@ public class Unit {
 	private int team;
 	private boolean moved = false;
 	
+	private boolean moving = false;
+	private Pair movePos;
+	
 	private Pair[] moveableSpaces;
 	
 	public Unit(int initPosX, int initPosY, UnitClass assignedClass, int team, final PApplet pa) {
@@ -36,6 +39,7 @@ public class Unit {
 		this.pa = pa;
 		this.inventory = new Weapon[Constants.MAX_INVENTORY];
 		this.team = team;
+		movePos = new Pair(initPosX, initPosY);
 	}
 	
 	public int addExp(int exp) {
@@ -57,8 +61,16 @@ public class Unit {
 		return moved;
 	}
 	
+	public boolean isMoving() {
+		return moving;
+	}
+	
 	public void setMoved(boolean value) {
 		moved = value;
+	}
+	
+	public void setMoving(boolean value) {
+		moving = value;
 	}
 	
 	public void setNewPos(int newX, int newY) {
@@ -87,7 +99,15 @@ public class Unit {
 		}
 	}
 	
+	public void setMovePos(int newX, int newY) {
+		movePos.x = newX;
+		movePos.y = newY;
+	}
+	
 	public Pair getPos() {
+		if(moving) {
+			return movePos;
+		}
 		return pos;
 	}
 
