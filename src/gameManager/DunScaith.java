@@ -7,6 +7,7 @@ import gui.SetUp;
 import map.MapStore;
 import map.TileSetStore;
 import processing.core.PApplet;
+import processing.core.PGraphics;
 import processing.core.PVector;
 import unitClass.ClassStore;
 import weapons.Blacksmith;
@@ -23,6 +24,8 @@ public class DunScaith extends PApplet {
 	private SetUp setup;
 	
 	private Game activeGame;
+	
+	private PGraphics gameScreen;
 	
 	// The argument passed to main must match the class name
     public static void main(String[] args) {
@@ -45,6 +48,8 @@ public class DunScaith extends PApplet {
 			System.out.println(weapons.getWeaponNames());
 			System.out.println(tiles.getTileNames());
 			System.out.println(maps.getMapNames());
+			
+			gameScreen = createGraphics((int)(0.9f * width), (int)(0.9f * height));
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -62,12 +67,7 @@ public class DunScaith extends PApplet {
     			drawSetupMenu();
     			break;
     		case Constants.STATE_GAME:
-    			pushMatrix();
-    			PVector gameCamPos = activeGame.getCamera().getTransPos();
-    			translate(gameCamPos.x, gameCamPos.y);
     			updateGame();
-    			popMatrix();
-    			//TOOD: Add UI drawing here (turn etc..)
     			break;
     		default:
     			background(0);
@@ -98,7 +98,7 @@ public class DunScaith extends PApplet {
     }
     
     public void startGame(boolean[] teams, String mapName, int startTurn) {
-    	activeGame = new Game(maps.getMapObj(mapName), teams[Constants.RED], teams[Constants.BLUE], teams[Constants.GREEN], teams[Constants.YELLOW], startTurn, this, classes);
+    	activeGame = new Game(maps.getMapObj(mapName), teams[Constants.RED], teams[Constants.BLUE], teams[Constants.GREEN], teams[Constants.YELLOW], startTurn, this, classes, weapons);
     	gameState = Constants.STATE_GAME;
     }
     

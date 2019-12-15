@@ -12,9 +12,19 @@ public class Weapon implements Cloneable {
 	private boolean healing;
 	private int weaponType;
 	private int rarity;
-	
-	public Weapon(String name, int attack, int hitRate, int critRate, int maxRange, int minRange, int initDurability, boolean healing, int weaponType) {
-		
+
+	public Weapon(String name, int attack, int hitRate, int critRate, int maxRange, int minRange, int durability,
+			boolean healing, int weaponType, int rarity) {
+		this.name = name;
+		this.attack = attack;
+		this.hitRate = hitRate;
+		this.critRate = critRate;
+		this.maxRange = maxRange;
+		this.minRange = minRange;
+		this.durability = durability;
+		this.healing = healing;
+		this.weaponType = weaponType;
+		this.rarity = rarity;
 	}
 
 	public String getName() {

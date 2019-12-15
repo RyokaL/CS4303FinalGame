@@ -1,6 +1,10 @@
 package gameManager;
 
 import java.util.ArrayList;
+import java.util.List;
+import java.util.function.Predicate;
+import java.util.stream.Collector;
+import java.util.stream.Collectors;
 
 import helpers.Pair;
 import playerUnits.Unit;
@@ -34,6 +38,14 @@ public class Player {
 			}
 		}
 		return null;
+	}
+	
+	public long getUnitsToMove() {
+		return units.stream().filter(((Predicate<Unit>)Unit::hasMoved).negate()).count();
+	}
+	
+	public List<Unit> getUnmovedUnits() {
+		return units.stream().filter(((Predicate<Unit>)Unit::hasMoved).negate()).collect(Collectors.toList());
 	}
 	
 	public boolean isEmpty() {

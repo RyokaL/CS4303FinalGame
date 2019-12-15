@@ -58,8 +58,10 @@ public class Blacksmith {
 		return maxRarity;
 	}
 	
-	public Weapon getWeaponObj(String weaponName) throws CloneNotSupportedException {
-		return weaponList.get(weaponName).clone();
+	public Weapon getWeaponObj(String weaponName) {
+		Weapon toCopy =  weaponList.get(weaponName);
+		Weapon newCopy = new Weapon(toCopy.getName(), toCopy.getAttack(), toCopy.getHitRate(), toCopy.getCriticalRate(), toCopy.getMaxRange(), toCopy.getMinRange(), toCopy.getDurability(), toCopy.isHealing(), toCopy.getWeaponType(), toCopy.getRarity());
+		return newCopy;
 	}
 	
 	public Set<String> getWeaponNames() {

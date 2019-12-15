@@ -1,5 +1,7 @@
 package playerUnits;
 
+import java.util.Arrays;
+
 import constants.Constants;
 import helpers.Pair;
 import processing.core.PApplet;
@@ -158,5 +160,52 @@ public class Unit {
 
 	public int getLevel() {
 		return level;
+	}
+
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + experiencePoints;
+		result = prime * result + healthPoints;
+		result = prime * result + level;
+		result = prime * result + (moved ? 1231 : 1237);
+		result = prime * result + (moving ? 1231 : 1237);
+		result = prime * result + ((pos == null) ? 0 : pos.hashCode());
+		result = prime * result + Arrays.hashCode(stats);
+		result = prime * result + team;
+		return result;
+	}
+
+	@Override
+	//Auto-generated
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		Unit other = (Unit) obj;
+		if (experiencePoints != other.experiencePoints)
+			return false;
+		if (healthPoints != other.healthPoints)
+			return false;
+		if (level != other.level)
+			return false;
+		if (moved != other.moved)
+			return false;
+		if (moving != other.moving)
+			return false;
+		if (pos == null) {
+			if (other.pos != null)
+				return false;
+		} else if (!pos.equals(other.pos))
+			return false;
+		if (!Arrays.equals(stats, other.stats))
+			return false;
+		if (team != other.team)
+			return false;
+		return true;
 	}
 }

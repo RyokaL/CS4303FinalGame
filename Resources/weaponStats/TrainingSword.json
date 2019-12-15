@@ -1,5 +1,5 @@
 {
-	"name" : "Example Sword",
+	"name" : "Training Sword",
 	"attack" : 5,
 	"hitRate" : 90,
 	"critRate" : 1,

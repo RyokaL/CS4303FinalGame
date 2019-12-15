@@ -51,7 +51,9 @@ public class Map {
 				listOfSpaces.add(new Pair(initPos.x, initPos.y - i));
 			}
 		}
-		return (Pair[])listOfSpaces.toArray();
+		Pair[] toReturn = new Pair[listOfSpaces.size()];
+		listOfSpaces.toArray(toReturn);
+		return toReturn;
 	}
 	
 	public Pair[] getMovementSpaces(Unit unitToCheck, Unit[][] unitMap) {

@@ -20,9 +20,12 @@ public class UnitBattleMenu {
 	private final PApplet pa;
 	private Game returnGame;
 	
+	private Camera gameCam;
+	
 	public UnitBattleMenu(final PApplet pa, Game returnGame, Unit selectedUnit, Camera gameCam) {
 		this.pa = pa;
 		this.returnGame = returnGame;
+		this.gameCam = gameCam;
 		
 		actions = new Button[ACTION_BUTTONS];
 		
@@ -68,13 +71,13 @@ public class UnitBattleMenu {
 						//Selected an option, carry out
 						switch(selectedIndex) {
 							case ACTION_ATTACK:
-								//Bring up attack selection
+								returnGame.selectAttack();
 								break;
 							case ACTION_INV:
 								//Bring up inventory menu
 								break;
 							case ACTION_WAIT:
-								returnGame.moveAndUpdateSelection();
+								returnGame.moveAndUpdateSelection(gameCam.getSelectedGridPos());
 								break;
 						}
 						break;

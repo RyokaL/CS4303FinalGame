@@ -23,6 +23,8 @@ public class BattleMenu {
 	private Button[] actions;
 	private int selectedIndex;
 	
+	private BattleUI extraInfo;
+	
 	PVector currentTrans;
 	
 	public BattleMenu(final PApplet pa, Game returnGame, Player currentPlayer, PVector currentTrans) {
@@ -40,6 +42,8 @@ public class BattleMenu {
 		actions[ACTION_SUSPEND] = new Button(pa.width/2, 0.5f * pa.height, 200, 100, 255, 128, 255, "Suspend", pa);
 		
 		actions[selectedIndex].setHighlighted();
+		
+		extraInfo = new BattleUI(pa);
 	}
 	
 	public void update() {
@@ -95,12 +99,15 @@ public class BattleMenu {
 								break;
 						}
 						break;
+					case 'e':
 					case 'q':
 						returnGame.cancelSelection();
 						break;
 				}
 			}
 		}
+		extraInfo.update(currentPlayer);
+		
 		pa.popMatrix();
 	}
 }

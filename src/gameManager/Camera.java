@@ -6,6 +6,7 @@ import processing.core.PApplet;
 import processing.core.PVector;
 
 public class Camera {
+	
 	private PVector actualPos;
 	private Pair gridPos;
 	private float tileSize;
@@ -38,7 +39,7 @@ public class Camera {
 	}
 	
 	public PVector getTransPos() {
-		return new PVector(-(actualPos.x - tileSize/2), -(actualPos.y - tileSize/2));
+		return new PVector(-(-2* initActPosX + actualPos.x - tileSize/2), -(-2* initActPosY + actualPos.y - tileSize/2));
 	}
 	
 	public Pair getSelectedGridPos() {
