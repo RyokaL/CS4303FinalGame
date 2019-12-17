@@ -61,6 +61,8 @@ public class Game {
 	private boolean unitSelected;
 	private Unit selectedUnit;
 	
+	private boolean showExtra = true;
+	
 	private Item tradeFirst;
 	private boolean startedTrade;
 	private Unit otherUnit;
@@ -176,7 +178,34 @@ public class Game {
 					//display info on healing changes
 				}
 				else if(selected.getTeam() != selectedUnit.getTeam()) {
-					//display info on attack
+					if(showExtra) {
+						pa.pushMatrix();
+						PVector currTrans = cam.getTransPos();
+						pa.translate(-currTrans.x, -currTrans.y);
+						
+						pa.fill(255, 200);
+						pa.rect(2* pa.width/4, pa.height/2, 250, 250);
+						pa.fill(0, 200);
+						pa.rect(2* pa.width/4, pa.height/2 - 100, 250, 100);
+						
+						pa.fill(255, 200);
+						pa.rect(3* pa.width/4, pa.height/2, 250, 250);
+						pa.fill(0, 200);
+						pa.rect(3* pa.width/4, pa.height/2 - 100, 250, 100);
+						
+						Triple damage = getDamage(selectedUnit, selected);
+						
+						pa.textAlign(PConstants.LEFT);
+						pa.fill(255);
+						pa.text(selectedUnit.getAssignedClass().getName(), 2* pa.width/4, pa.height/2);
+						pa.text(selected.getAssignedClass().getName(), 3* pa.width/4, pa.height/2);
+						pa.fill(0);
+						pa.text("Dmg: " + damage.x, 3* pa.width/4, pa.height/2 + 50);
+						pa.text("Hit: " + damage.y + "%", 2* pa.width/4, pa.height/2 + 100);
+						pa.text("Crit: " + damage.z + "%", 2* pa.width/4, pa.height/2 + 150);
+						
+						pa.popMatrix();
+					}
 				}
 			}
 			else {
@@ -185,6 +214,26 @@ public class Game {
 				for(Pair p : toDraw) {
 					Triple t = cam.convertToDrawPos(p);
 					pa.rect(t.X, t.Y, t.Z, t.Z);
+				}
+				
+				if(showExtra) {
+					pa.pushMatrix();
+					PVector currTrans = cam.getTransPos();
+					pa.translate(-currTrans.x, -currTrans.y);
+					
+					pa.fill(255, 200);
+					pa.rect(3* pa.width/4, pa.height/2, 250, 250);
+					pa.fill(0, 200);
+					pa.rect(3* pa.width/4, pa.height/2 - 100, 250, 100);
+					
+					pa.textAlign(PConstants.LEFT);
+					pa.fill(255);
+					pa.text(selected.getAssignedClass().getName(), 3* pa.width/4, pa.height/2);
+					pa.fill(0);
+					pa.text("Lv. "  + selected.getLevel(), 3* pa.width/4, pa.height/2 + 50);
+					pa.text("HP: " + selected.getHealthPoints() + "/" + selected.getStats()[Constants.HP], 3* pa.width/4, pa.height/2 + 100);
+					
+					pa.popMatrix();
 				}
 			}
 		}
@@ -273,6 +322,9 @@ public class Game {
 						break;
 					case 'd':
 						//Move to next unmoved unit
+						break;
+					case 's':
+						showExtra = !showExtra;
 						break;
 				}
 			}
@@ -589,6 +641,28 @@ public class Game {
 		openMenuState = NO_MENU;
 	}
 	
+	private Triple getDamage(Unit attack, Unit defend) {
+		int chanceToHit;
+		int critChance;
+		int damage;
+		if(attack.getEquipped() != null) {
+			chanceToHit = attack.getEquipped().getHitRate(); //Maybe alter this
+			critChance = (int) (attack.getEquipped().getCriticalRate() + 0.25 * attack.getStats()[Constants.DEX]);
+			if(attack.getEquipped().getWeaponType() == Constants.MAGIC) {
+				damage = attack.getEquipped().getAttack() + attack.getStats()[Constants.MAG] - defend.getStats()[Constants.MDEF];
+			}
+			else {
+				damage = attack.getEquipped().getAttack() + attack.getStats()[Constants.STR] - defend.getStats()[Constants.DEF];
+			}
+		}
+		else {
+			chanceToHit = 100;
+			critChance = 0;
+			damage = 1 + attack.getStats()[Constants.STR] - (int)(1.5f * defend.getStats()[Constants.DEF]);
+		}
+		return new Triple(damage, chanceToHit, critChance);
+	}
+	
 	public void attackUnit(Unit other) {
 		int chanceToHit;
 		int critChance;
@@ -608,7 +682,7 @@ public class Game {
 			critChance = 0;
 			damage = 1 + selectedUnit.getStats()[Constants.STR] - (int)(1.5f * other.getStats()[Constants.DEF]);
 		}
-		//Do stuff with follow-up attacks && counters and other damage bonuses
+		//TODO: Do stuff with follow-up attacks && counters and other damage bonuses
 		
 		if(damage < 0) {
 			damage = 0;
