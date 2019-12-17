@@ -4,13 +4,11 @@ import java.io.IOException;
 import constants.Constants;
 import gui.MainMenu;
 import gui.SetUp;
+import items.Blacksmith;
 import map.MapStore;
 import map.TileSetStore;
 import processing.core.PApplet;
-import processing.core.PGraphics;
-import processing.core.PVector;
 import unitClass.ClassStore;
-import weapons.Blacksmith;
 
 public class DunScaith extends PApplet {
 	ClassStore classes;
@@ -24,8 +22,6 @@ public class DunScaith extends PApplet {
 	private SetUp setup;
 	
 	private Game activeGame;
-	
-	private PGraphics gameScreen;
 	
 	// The argument passed to main must match the class name
     public static void main(String[] args) {
@@ -41,15 +37,13 @@ public class DunScaith extends PApplet {
     public void setup(){
         try {
 			classes = new ClassStore("Resources/jobClasses", this);
-			weapons = new Blacksmith("Resources/weaponStats", this);
+			weapons = new Blacksmith("Resources/weaponStats", "Resources/useItems", this);
 			tiles = new TileSetStore("Resources/tiles", this);
 			maps = new MapStore("Resources/maps", this);
 			System.out.println(classes.getClassNames());
 			System.out.println(weapons.getWeaponNames());
 			System.out.println(tiles.getTileNames());
 			System.out.println(maps.getMapNames());
-			
-			gameScreen = createGraphics((int)(0.9f * width), (int)(0.9f * height));
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

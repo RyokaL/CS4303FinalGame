@@ -3,26 +3,24 @@ package gameManager;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Predicate;
-import java.util.stream.Collector;
 import java.util.stream.Collectors;
 
 import helpers.Pair;
+import items.Item;
+import items.Weapon;
 import playerUnits.Unit;
-import weapons.Weapon;
 
 public class Player {
 
 	private int team;
 	private int gold;
 	private ArrayList<Unit> units;
-	private ArrayList<Weapon> inventory;
 	
 	public Player(int team, Unit initialUnit) {
 		this.team = team;
 		this.gold = 0;
 		this.units = new ArrayList<Unit>();
 		this.units.add(initialUnit);
-		this.inventory = new ArrayList<Weapon>();
 	}
 	
 	public Player(int team) {
@@ -52,6 +50,10 @@ public class Player {
 		return units.isEmpty();
 	}
 	
+	public boolean hasLost() {
+		return units.isEmpty() || !units.get(0).getAssignedClass().getName().equals("Tactician");
+	}
+	
 	public int getTeam() {
 		return team;
 	}
@@ -78,13 +80,5 @@ public class Player {
 	
 	public boolean removeUnit(Unit toRemove) {
 		return units.remove(toRemove);
-	}
-	
-	public ArrayList<Weapon> getInventory() {
-		return inventory;
-	}
-	
-	public void addToInventory(Weapon toAdd) {
-		inventory.add(toAdd);
 	}
 }

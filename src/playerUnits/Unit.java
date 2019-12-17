@@ -4,9 +4,10 @@ import java.util.Arrays;
 
 import constants.Constants;
 import helpers.Pair;
+import items.Item;
+import items.Weapon;
 import processing.core.PApplet;
 import unitClass.UnitClass;
-import weapons.Weapon;
 
 public class Unit {
 
@@ -16,7 +17,7 @@ public class Unit {
 	private Pair pos;
 	private int[] stats;
 	private int healthPoints;
-	private Weapon[] inventory;
+	private Item[] inventory;
 	private int inventorySize;
 	private Weapon equipped;
 	private UnitClass assignedClass;
@@ -31,6 +32,12 @@ public class Unit {
 	
 	private Pair[] moveableSpaces;
 	
+	private int turnTimer;
+	private boolean effect = false;
+	
+	private int[] currentEffectedStats;
+	private int[] currentEffects;
+	
 	public Unit(int initPosX, int initPosY, UnitClass assignedClass, int team, final PApplet pa) {
 		this.pos = new Pair(initPosX, initPosY);
 		this.assignedClass = assignedClass;
@@ -39,9 +46,29 @@ public class Unit {
 		this.level = 1;
 		this.experiencePoints = 0;
 		this.pa = pa;
-		this.inventory = new Weapon[Constants.MAX_INVENTORY];
+		this.inventory = new Item[Constants.MAX_INVENTORY];
 		this.team = team;
 		movePos = new Pair(initPosX, initPosY);
+	}
+	
+	public void updateEffects() {
+		if(effect) {
+			turnTimer -= 1;
+			if(turnTimer <= 0) {
+				int j = 0;
+				for(int i : currentEffectedStats) {
+					stats[i] -= currentEffects[j];
+					if(i == Constants.HP) {
+						healthPoints -= currentEffects[j];
+						if(healthPoints < 0) {
+							healthPoints = 1;
+						}
+					}
+					j++;
+				}
+				effect = false;
+			}
+		}
 	}
 	
 	public int addExp(int exp) {
@@ -84,12 +111,32 @@ public class Unit {
 		moveableSpaces = newSpaces;
 	}
 	
-	public void equipWeapon(Weapon toEquip) {
-		equipped = toEquip;
+	public boolean equipWeapon(Weapon toEquip) {
+		boolean equippable = false;
+		if(toEquip != null) {
+			int[] types = assignedClass.getEquipableWeapons();
+			for(int i = 0; i < types.length; i++) {
+				if(toEquip.getWeaponType() == types[i]) {
+					equippable = true;
+					break;
+				}
+			}	
+		}
+		else {
+			equippable = true;
+		}
+		if(equippable) {
+			equipped = toEquip;
+		}
+		return equippable;
 	}
 	
 	public Pair[] getMoveableSpaces() {
 		return moveableSpaces;
+	}
+	
+	public boolean hasEffect() {
+		return effect;
 	}
 	
 	private void levelUp() {
@@ -117,7 +164,7 @@ public class Unit {
 		return stats;
 	}
 	
-	public boolean addToInventory(Weapon toAdd) {
+	public boolean addToInventory(Item toAdd) {
 		if(inventorySize >= Constants.MAX_INVENTORY) {
 			return false;
 		}
@@ -126,6 +173,28 @@ public class Unit {
 			inventorySize += 1;
 			return true;
 		}
+	}
+	
+	private void resortInventory() {
+		int nullIndex = 0;
+		boolean found = false;
+		for(int i = 0; i < inventory.length; i++) {
+			if(found) {
+				inventory[nullIndex] = inventory[i];
+				inventory[i] = null;
+				break;
+			}
+			if(inventory[i] == null) {
+				nullIndex = i;
+				found = true;
+			}
+		}
+	}
+	
+	public void removeFromInventory(int index) {
+		inventorySize -= 1;
+		inventory[index] = null;
+		resortInventory();
 	}
 	
 	public void takeDamage(int damage) {
@@ -146,8 +215,12 @@ public class Unit {
 		return healthPoints;
 	}
 
-	public Weapon[] getInventory() {
+	public Item[] getInventory() {
 		return inventory;
+	}
+	
+	public int getInventorySize() {
+		return inventorySize;
 	}
 
 	public Weapon getEquipped() {
@@ -160,6 +233,33 @@ public class Unit {
 
 	public int getLevel() {
 		return level;
+	}
+	
+	public void applyEffect(int[] statsAffected, int[] effects, int time) {
+		int j = 0;
+		for(int i : statsAffected) {
+			if(i == Constants.HP && time == -1) {
+				stats[i] += effects[j];
+				healthPoints += effects[j];
+			}
+			else if (i == Constants.HP && time == 0) {
+				healthPoints += effects[j];
+				if(healthPoints >= stats[Constants.HP]) {
+					healthPoints = stats[Constants.HP];
+				}
+			}
+			else {
+				stats[i] += effects[j];
+			}
+			j++;
+		}
+		if(time > 0) {
+			//Set timer
+			currentEffectedStats = statsAffected;
+			currentEffects = effects;
+			turnTimer = time;
+			effect = true;
+		}
 	}
 
 	@Override
@@ -207,5 +307,23 @@ public class Unit {
 		if (team != other.team)
 			return false;
 		return true;
+	}
+
+	public void damageWeapon() {
+		equipped.damage();
+		if(equipped.getDurability() <= 0) {
+			boolean found = false;
+			for(int i = 0; i < inventory.length; i++) {
+				if(inventory[i] instanceof Weapon) {
+					equipped = (Weapon)inventory[i];
+					removeFromInventory(i);
+					found = true;
+					break;
+				}
+			}
+			if(!found) {
+				equipped = null;
+			}
+		}
 	}
 }

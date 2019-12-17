@@ -10,18 +10,19 @@ import processing.core.PImage;
 import processing.core.PVector;
 import unitClass.ClassStore;
 import unitClass.UnitClass;
-import weapons.Blacksmith;
-import weapons.Weapon;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 
 import constants.Constants;
 import gui.BattleMenu;
-import gui.BattleUI;
+import gui.ItemMenu;
 import gui.UnitBattleMenu;
 import helpers.Pair;
 import helpers.Triple;
+import items.Blacksmith;
+import items.Item;
+import items.Weapon;
 
 public class Game {
 
@@ -30,15 +31,14 @@ public class Game {
 	private final int NO_MENU = 0;
 	private final int ACTION_MENU = 1;
 	private final int PLAYER_MENU = 2;
+	private final int TRADE_MENU = 3;
 	
 	private final int SELECT_NORMAL = 0;
 	private final int SELECT_ATTACK = 1;
-	private final int SELECT_PLACE = 2;
-	
+	private final int SELECT_TRADE = 2;
 	private UnitBattleMenu unitMenu = null;
 	private BattleMenu playerMenu = null;
-	
-	private BattleUI gameUI;
+	private ItemMenu tradeMenu = null;
 	
 	private Player rTeam, bTeam, gTeam, yTeam, enemy;
 	private ArrayList<Player> teams = new ArrayList<Player>(5);
@@ -61,6 +61,11 @@ public class Game {
 	private boolean unitSelected;
 	private Unit selectedUnit;
 	
+	private Item tradeFirst;
+	private boolean startedTrade;
+	private Unit otherUnit;
+	private int tradeIndex;
+	
 	private int openMenuState = 0;
 	
 	private int selectState = 0;
@@ -81,6 +86,10 @@ public class Game {
 			Unit redPlayer = initUnit(Constants.RED);
 			easyAccessMap[redPlayer.getPos().x][redPlayer.getPos().y] = redPlayer;
 			rTeam = new Player(Constants.RED, redPlayer);
+			Unit newUnit = initUnit(Constants.RED);
+			newUnit.setNewPos(0, 1);
+			rTeam.addUnit(newUnit);
+			easyAccessMap[0][1] = newUnit;
 		}
 		if(blue) {
 			Unit bluePlayer = initUnit(Constants.BLUE);
@@ -116,8 +125,6 @@ public class Game {
 		this.startTurn = startTurn;
 		Pair camStartPos = teams.get(turn).getUnits().get(0).getPos(); 
 		cam = new Camera(camStartPos.x, camStartPos.y, map.getTileSize(), map.getMapStartPosX(), map.getMapStartPosY(), pa);
-		
-		gameUI = new BattleUI(pa);
 	}
 	
 	public Camera getCamera() {
@@ -165,7 +172,7 @@ public class Game {
 		}
 		if((selected = isPosUnit()) != null) {
 			if(selectState == SELECT_ATTACK) {
-				if(selectedUnit.getEquipped().isHealing() && selected.getTeam() == selectedUnit.getTeam()) {
+				if(selectedUnit.getEquipped() != null && selectedUnit.getEquipped().isHealing() && selected.getTeam() == selectedUnit.getTeam()) {
 					//display info on healing changes
 				}
 				else if(selected.getTeam() != selectedUnit.getTeam()) {
@@ -211,17 +218,6 @@ public class Game {
 				pa.noStroke();
 				float healthPercentage = 25 * ((float)u.getHealthPoints()/(float)u.getStats()[Constants.HP]);
 				pa.rect(actXPos + sprite.width/4, actYPos + sprite.height * 1.25f + 0.5f, healthPercentage, 4);
-				
-				//If the unit has moved to a spot with loot, collect it
-				if(loot.containsKey(unitPos)) {
-					Resource obtained = loot.remove(unitPos);
-					currTeam.addGold(obtained.getGold());
-					if(obtained.hasLoot()) {
-						if(!u.addToInventory(obtained.getLoot())) {
-							currTeam.addToInventory(obtained.getLoot());
-						}
-					}
-				}
 			}
 		}
 		
@@ -235,6 +231,10 @@ public class Game {
 		//Draw player menu
 		if(openMenuState == PLAYER_MENU) {
 			playerMenu.update();
+		}
+		
+		if(openMenuState == TRADE_MENU) {
+			tradeMenu.update();
 		}
 		
 		//Key input
@@ -304,45 +304,71 @@ public class Game {
 	
 	public int getWinner() {
 		//TODO: Definitely better way of checking this
-		if(!rTeam.isEmpty() && bTeam.isEmpty() && gTeam.isEmpty() && yTeam.isEmpty()) {
-			return Constants.RED;
+		if(red) {
+			if(!rTeam.hasLost() && (!blue || bTeam.hasLost()) && (!green || gTeam.hasLost()) && (!yellow || yTeam.hasLost())) {
+				return Constants.RED;
+			}
 		}
-		else if(rTeam.isEmpty() && !bTeam.isEmpty() && gTeam.isEmpty() && yTeam.isEmpty()) {
-			return Constants.BLUE;
+		
+		if(blue) {
+			if((!red || rTeam.hasLost()) && (!bTeam.hasLost()) && (!green || gTeam.hasLost()) && (!yellow || yTeam.hasLost())) {
+				return Constants.BLUE;
+			}
 		}
-		else if(rTeam.isEmpty() && bTeam.isEmpty() && !gTeam.isEmpty() && yTeam.isEmpty()) {
-			return Constants.GREEN;
+		
+		if(green) {
+			if((!red || rTeam.hasLost()) && (!blue || bTeam.hasLost()) && (!gTeam.hasLost()) && (!yellow || yTeam.hasLost())) {
+				return Constants.GREEN;
+			}
 		}
-		else if(rTeam.isEmpty() && bTeam.isEmpty() && gTeam.isEmpty() && !yTeam.isEmpty()) {
-			return Constants.YELLOW;
+		
+		if(yellow) {
+			if((!red || rTeam.hasLost()) && (!blue || bTeam.hasLost()) && (!green || gTeam.hasLost()) && (!yTeam.hasLost())) {
+				return Constants.YELLOW;
+			}
 		}
-		else if(rTeam.isEmpty() && bTeam.isEmpty() && gTeam.isEmpty() && yTeam.isEmpty()) {
+		
+		if((!red || rTeam.hasLost()) && (!blue || bTeam.hasLost()) && (!green || gTeam.hasLost()) && (!yellow || yTeam.hasLost())) {
 			return Constants.ENEMY;
 		}
-		else {
-			return -1;
+		
+		return -1;
+	}
+	
+	private void nextTurn() {
+		//Pass turn here
+		turn = (turn + 1) % 5;
+		if(turn == Constants.RED && (!red || rTeam.isEmpty())) {
+			nextTurn();
+			return;
+		}
+		else if(turn == Constants.BLUE && (!blue || bTeam.isEmpty())) {
+			nextTurn();
+			return;
+		}
+		else if(turn == Constants.GREEN && (!green || gTeam.isEmpty())) {
+			nextTurn();
+			return;
+		}
+		else if(turn == Constants.YELLOW && (!yellow || yTeam.isEmpty())) {
+			nextTurn();
+			return;
+		}
+		else if(turn == Constants.ENEMY && enemy.isEmpty()) {
+			nextTurn();
+			return;
 		}
 	}
 	
 	public void endCurrentTurn() {
-		//Pass turn here
-		turn = (turn + 1) % 5;
-		if(turn == Constants.RED && !red) {
-			endCurrentTurn();
-			return;
+		cancelSelection();
+		//Check win
+		int winState = getWinner();
+		if(winState != -1) {
+			System.out.println("Winner is: " + winState);
 		}
-		else if(turn == Constants.BLUE && !blue) {
-			endCurrentTurn();
-			return;
-		}
-		else if(turn == Constants.GREEN && !green) {
-			endCurrentTurn();
-			return;
-		}
-		else if(turn == Constants.YELLOW && !yellow) {
-			endCurrentTurn();
-			return;
-		}
+		
+		nextTurn();
 		
 		for(Unit[] uArray : easyAccessMap) {
 			for(Unit u : uArray) {
@@ -354,7 +380,7 @@ public class Game {
 				u.setMoved(false);
 			}
 		}
-		//TODO: Skip enemy turn for now/camera movement
+		//TODO: Skip enemy turn camera movement for now, change to show movements
 		if(turn != Constants.ENEMY) {
 			Pair camNewTurnPos = teams.get(turn).getUnits().get(0).getPos();
 			cam.updateGridPos(camNewTurnPos.x, camNewTurnPos.y);
@@ -371,6 +397,7 @@ public class Game {
 				}
 				ArrayList<Unit> currTeam = teams.get(i).getUnits();
 				for(Unit u : currTeam) {
+					u.updateEffects();
 					Pair unitPos = u.getPos();
 					Tile currTile = map.getTileAtPos(unitPos);
 					if(currTile.isHealing()) {
@@ -404,7 +431,7 @@ public class Game {
 	private Unit initUnit(int team) {
 		//This could maybe be altered?
 		String initialUnit = "Tactician";
-		String initialWeapon = "Training Sword";
+		String initialWeapon = "Worn Bow";
 		
 		UnitClass initClass = classes.getClassObj(initialUnit);
 		Weapon initWeapon = weapons.getWeaponObj(initialWeapon);
@@ -430,6 +457,7 @@ public class Game {
 		
 		if(toReturn != null) {
 			toReturn.equipWeapon(initWeapon);
+			toReturn.addToInventory(weapons.getItemObj("Healing Potion"));
 		}
 		return toReturn;
 	}
@@ -451,6 +479,20 @@ public class Game {
 	public void selectCurrentPos() {
 		Pair currentPos = cam.getSelectedGridPos();
 		if(unitSelected) {
+			if(selectState == SELECT_TRADE) {
+				for(Pair p : map.getReach(selectedUnit, 1, 1)) {
+					if(currentPos.equals(p)) {
+						Unit toTrade;
+						if((toTrade = easyAccessMap[currentPos.x][currentPos.y]) != null) {
+							if(toTrade.getTeam() == turn) {
+								tradeMenu = new ItemMenu(pa, this, selectedUnit, cam.getTransPos());
+								openMenuState = TRADE_MENU;
+								otherUnit = toTrade;
+							}
+						}
+					}
+				}
+			}
 			if(selectState == SELECT_ATTACK) {
 				for(Pair p : map.getAttackSpaces(selectedUnit)) {
 					if(currentPos.equals(p)) {
@@ -507,12 +549,27 @@ public class Game {
 		}
 	}
 	
+	private void chooseItemToRemove() {
+		
+	}
+	
 	public void moveAndUpdateSelection(Pair newPos) {
 		selectedUnit.setMoving(false);
 		easyAccessMap[selectedUnit.getPos().x][selectedUnit.getPos().y] = null;
 		selectedUnit.setNewPos(newPos.x, newPos.y);
 		selectedUnit.setMoved(true);
 		easyAccessMap[selectedUnit.getPos().x][selectedUnit.getPos().y] = selectedUnit;
+		
+		//If the unit has moved to a spot with loot, collect it
+		if(loot.containsKey(newPos)) {
+			Resource obtained = loot.remove(newPos);
+			teams.get(turn).addGold(obtained.getGold());
+			if(obtained.hasLoot()) {
+				if(!selectedUnit.addToInventory(obtained.getLoot())) {
+					//TODO: Do something? - make choose an item to remove?
+				}
+			}
+		}
 		
 		cancelSelection();
 		
@@ -533,11 +590,25 @@ public class Game {
 	}
 	
 	public void attackUnit(Unit other) {
-		int chanceToHit = selectedUnit.getEquipped().getHitRate(); //Maybe alter this
-		int critChance = (int) (selectedUnit.getEquipped().getCriticalRate() + 0.25 * selectedUnit.getStats()[Constants.DEX]);
-		int damage = selectedUnit.getEquipped().getAttack() + selectedUnit.getStats()[Constants.STR] - other.getStats()[Constants.DEF];
-		
-		//Do stuff with follow-up attacks && counters
+		int chanceToHit;
+		int critChance;
+		int damage;
+		if(selectedUnit.getEquipped() != null) {
+			chanceToHit = selectedUnit.getEquipped().getHitRate(); //Maybe alter this
+			critChance = (int) (selectedUnit.getEquipped().getCriticalRate() + 0.25 * selectedUnit.getStats()[Constants.DEX]);
+			if(selectedUnit.getEquipped().getWeaponType() == Constants.MAGIC) {
+				damage = selectedUnit.getEquipped().getAttack() + selectedUnit.getStats()[Constants.MAG] - other.getStats()[Constants.MDEF];
+			}
+			else {
+				damage = selectedUnit.getEquipped().getAttack() + selectedUnit.getStats()[Constants.STR] - other.getStats()[Constants.DEF];
+			}
+		}
+		else {
+			chanceToHit = 100;
+			critChance = 0;
+			damage = 1 + selectedUnit.getStats()[Constants.STR] - (int)(1.5f * other.getStats()[Constants.DEF]);
+		}
+		//Do stuff with follow-up attacks && counters and other damage bonuses
 		
 		if(damage < 0) {
 			damage = 0;
@@ -551,8 +622,11 @@ public class Game {
 		}		
 		other.takeDamage(damage);
 		
-		if(other.getHealthPoints() < 0) {
+		selectedUnit.damageWeapon();
+		
+		if(other.getHealthPoints() <= 0) {
 			teams.get(other.getTeam()).removeUnit(other);
+			easyAccessMap[other.getPos().x][other.getPos().y] = null;
 		}
 	}
 	
@@ -564,8 +638,38 @@ public class Game {
 		
 		unitSelected = false;
 		selectedUnit = null;
+		startedTrade = false;
 		openMenuState = NO_MENU;
 		selectState = SELECT_NORMAL;
-		unitMenu = null;
+	}
+
+	public void selectTrade() {
+		selectState = SELECT_TRADE;
+		openMenuState = NO_MENU;
+	}
+
+	public void confirmTrade(Item item, int index) {
+		if(startedTrade) {
+			if(tradeIndex > -1) {
+				selectedUnit.removeFromInventory(tradeIndex);
+			}
+			if(index > -1) {
+				otherUnit.removeFromInventory(index);
+			}
+			
+			if(item != null) {
+				selectedUnit.addToInventory(item);
+			}
+			if(tradeFirst != null) {
+				otherUnit.addToInventory(tradeFirst);
+			}
+			cancelSelection();
+		}
+		else {
+			tradeFirst = item;
+			tradeIndex = index;
+			startedTrade = true;
+			tradeMenu = new ItemMenu(pa, this, otherUnit, cam.getTransPos());
+		}
 	}
 }

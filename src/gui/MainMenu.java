@@ -11,11 +11,9 @@ public class MainMenu {
 	private Button startGame;
 	private Button[] menuButtons;
 	
-	private final PApplet pa;
 	private DunScaith returnClass;
 	
 	public MainMenu(final PApplet pa, DunScaith returnClass) {
-		this.pa = pa;
 		this.returnClass = returnClass;
 		menuButtons = new Button[MENU_BUTTONS];
 		

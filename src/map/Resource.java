@@ -1,7 +1,7 @@
 package map;
 
 import helpers.Pair;
-import weapons.Weapon;
+import items.Weapon;
 
 public class Resource {
 

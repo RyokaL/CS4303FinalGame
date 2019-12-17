@@ -30,30 +30,63 @@ public class Map {
 	private Pair greenStartPos;
 	private Pair yellowStartPos;
 	
-	public Pair[] getAttackSpaces(Unit unitToCheck) {
+	public Pair[] getReach(Unit unitToCheck, int minRange, int maxRange) {
 		HashSet<Pair> listOfSpaces = new HashSet<Pair>();
-		int minRange = unitToCheck.getEquipped().getMinRange();
-		int maxRange = unitToCheck.getEquipped().getMaxRange();
-		
+
 		Pair initPos = unitToCheck.getPos();
-		for(int i = minRange; i <= maxRange; i++) {
-			if(initPos.x + i < map[0].length) {
-				listOfSpaces.add(new Pair(initPos.x + i, initPos.y));
+		for(int i = 0; i <= maxRange; i++) {
+			if(i >= minRange) {
+				if(initPos.x + i < map[0].length) {
+					listOfSpaces.add(new Pair(initPos.x + i, initPos.y));
+				}
+				if(initPos.x - i >= 0) {
+					listOfSpaces.add(new Pair(initPos.x - i, initPos.y));
+				}
+				
+				if(initPos.y + i < map.length) {
+					listOfSpaces.add(new Pair(initPos.x, initPos.y + i));
+				}
+				if(initPos.y - i >= 0) {
+					listOfSpaces.add(new Pair(initPos.x, initPos.y - i));
+				}
 			}
-			if(initPos.x - i >= 0) {
-				listOfSpaces.add(new Pair(initPos.x - i, initPos.y));
-			}
+
 			
-			if(initPos.y + i < map.length) {
-				listOfSpaces.add(new Pair(initPos.x, initPos.y + 1));
-			}
-			if(initPos.y - i >= 0) {
-				listOfSpaces.add(new Pair(initPos.x, initPos.y - i));
+			if(i + i <= maxRange && i + i >= minRange) {
+				if(initPos.y - i >= 0 && initPos.x - i >= 0) {
+					listOfSpaces.add(new Pair(initPos.x - i, initPos.y - i));
+				}
+				
+				if(initPos.y + i >= 0 && initPos.x - i >= 0) {
+					listOfSpaces.add(new Pair(initPos.x - i, initPos.y + i));
+				}
+				
+				if(initPos.y - i >= 0 && initPos.x + i >= 0) {
+					listOfSpaces.add(new Pair(initPos.x + i, initPos.y - i));
+				}
+				
+				if(initPos.y + i >= 0 && initPos.x + i >= 0) {
+					listOfSpaces.add(new Pair(initPos.x + i, initPos.y + i));
+				}
 			}
 		}
 		Pair[] toReturn = new Pair[listOfSpaces.size()];
 		listOfSpaces.toArray(toReturn);
 		return toReturn;
+	}
+	
+	public Pair[] getAttackSpaces(Unit unitToCheck) {
+		int minRange;
+		int maxRange;
+		if(unitToCheck.getEquipped() == null) {
+			minRange = 1;
+			maxRange = 1;
+		}
+		else {
+			minRange = unitToCheck.getEquipped().getMinRange();
+			maxRange = unitToCheck.getEquipped().getMaxRange();
+		}
+		return getReach(unitToCheck, minRange, maxRange);
 	}
 	
 	public Pair[] getMovementSpaces(Unit unitToCheck, Unit[][] unitMap) {

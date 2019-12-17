@@ -3,7 +3,6 @@ package gui;
 import constants.Constants;
 import gameManager.Player;
 import processing.core.PApplet;
-import processing.core.PVector;
 
 public class BattleUI {
 	

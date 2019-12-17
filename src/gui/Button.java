@@ -73,6 +73,10 @@ public class Button {
 		return isClicked;
 	}
 	
+	public void setNewPos(float newX, float newY) {
+		posX = newX; posY = newY;
+	}
+	
 	public void update() {
 		//isClicked and mouseOver only lasts for a frame
 		isClicked = false;

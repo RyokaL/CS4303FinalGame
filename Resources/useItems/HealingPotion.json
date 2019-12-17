@@ -1,0 +1,8 @@
+{
+	"name" : "Healing Potion",
+	"statsAffected" : [0],
+	"statEffects" : [10],
+	"durability" : 3,
+	"effectTime" : 0,
+	"rarity" : 0
+}
