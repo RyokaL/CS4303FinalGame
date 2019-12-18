@@ -1,0 +1,10 @@
+{
+	"name" : "Plains",
+	"affectMove" : 0,
+	"affectedUnits" : -1,
+	"unitsCanOccupy" : 2,
+	"heal" : false,
+	"healPercent" : 0,
+	"trap" : false,
+	"damagePercent" : 0
+}

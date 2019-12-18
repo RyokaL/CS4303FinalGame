@@ -1,0 +1,10 @@
+{
+	"name" : "Heal Tile",
+	"affectMove" : 0,
+	"affectedUnits" : -1,
+	"unitsCanOccupy" : 3,
+	"heal" : true,
+	"healPercent" : 10,
+	"trap" : false,
+	"damagePercent" : 0
+}
