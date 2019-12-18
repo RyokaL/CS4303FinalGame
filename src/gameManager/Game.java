@@ -97,6 +97,10 @@ public class Game {
 			Unit redPlayer = initUnit(Constants.RED);
 			easyAccessMap[redPlayer.getPos().x][redPlayer.getPos().y] = redPlayer;
 			rTeam = new Player(Constants.RED, redPlayer);
+			Unit newUnit = initUnit(Constants.RED);
+			newUnit.setNewPos(0, 1);
+			rTeam.addUnit(newUnit);
+			easyAccessMap[0][1] = newUnit;
 		}
 		if(blue) {
 			Unit bluePlayer = initUnit(Constants.BLUE);
@@ -124,11 +128,11 @@ public class Game {
 		}
 		
 		enemy = new Player(Constants.ENEMY);
-//		Unit enemyTest = new Unit(2, 2, classes.getClassObj("Tactician"), Constants.ENEMY, pa);
-//		easyAccessMap[2][2] = enemyTest;
-//		enemyTest.equipWeapon(weapons.getWeaponObj("Training Sword"));
-//		enemyTest.addToInventory(weapons.getWeaponObj("Worn Bow"));
-//		enemy.addUnit(enemyTest);
+		Unit enemyTest = new Unit(2, 2, classes.getClassObj("Tactician"), Constants.ENEMY, pa);
+		easyAccessMap[2][2] = enemyTest;
+		enemyTest.equipWeapon(weapons.getWeaponObj("Training Sword"));
+		enemyTest.addToInventory(weapons.getWeaponObj("Worn Bow"));
+		enemy.addUnit(enemyTest);
 		teams.add(rTeam); teams.add(bTeam); teams.add(gTeam); teams.add(yTeam); teams.add(enemy);
 		
 		loot = new HashMap<Pair, Resource>();
@@ -163,7 +167,6 @@ public class Game {
 		
 		//Check if selected tile is a unit and draw reach:
 		//TODO: Make better :)
-		System.out.println(map.getMap().length + " " + map.getMap()[0].length);
 		Unit selected;
 		if(unitSelected) {
 			if(selectState == SELECT_ATTACK) {
