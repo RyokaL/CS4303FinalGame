@@ -1,0 +1,10 @@
+{
+	"name" : "Forest",
+	"affectMove" : 1,
+	"affectedUnits" : 5,
+	"unitsCanOccupy" : 3,
+	"heal" : false,
+	"healPercent" : 0,
+	"trap" : false,
+	"damagePercent" : 0
+}

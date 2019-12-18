@@ -122,7 +122,7 @@ public class Map {
 				}
 				
 				if(movement != 1) {
-					spacesToCheck.add(new Triple(t.x -1 + movement, t.y + 1, t.z));
+					spacesToCheck.add(new Triple(t.x -(1 + movement), t.y + 1, t.z));
 				}
 			}
 			//Check x - 1;
@@ -137,7 +137,7 @@ public class Map {
 				}
 				
 				if(movement != 1) {
-					spacesToCheck.add(new Triple(t.x -1 + movement, t.y - 1, t.z));
+					spacesToCheck.add(new Triple(t.x -(1 + movement), t.y - 1, t.z));
 				}
 			}
 			//Check y + 1;
@@ -152,7 +152,7 @@ public class Map {
 				}
 				
 				if(movement != 1) {
-					spacesToCheck.add(new Triple(t.x -1 + movement, t.y, t.z + 1));
+					spacesToCheck.add(new Triple(t.x -(1 + movement), t.y, t.z + 1));
 				}
 			}
 			//Check y - 1;
@@ -167,7 +167,7 @@ public class Map {
 				}
 				
 				if(movement != 1) {
-					spacesToCheck.add(new Triple(t.x -1 + movement, t.y, t.z - 1));
+					spacesToCheck.add(new Triple(t.x -(1 + movement), t.y, t.z - 1));
 				}
 			}
 		}
