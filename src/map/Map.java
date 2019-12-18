@@ -30,10 +30,9 @@ public class Map {
 	private Pair greenStartPos;
 	private Pair yellowStartPos;
 	
-	public Pair[] getReach(Unit unitToCheck, int minRange, int maxRange) {
+	public Pair[] getReachFromPos(Pair initPos, int minRange, int maxRange) {
 		HashSet<Pair> listOfSpaces = new HashSet<Pair>();
-
-		Pair initPos = unitToCheck.getPos();
+		
 		for(int i = 0; i <= maxRange; i++) {
 			if(i >= minRange) {
 				if(initPos.x + i < map[0].length) {
@@ -73,6 +72,11 @@ public class Map {
 		Pair[] toReturn = new Pair[listOfSpaces.size()];
 		listOfSpaces.toArray(toReturn);
 		return toReturn;
+	}
+	
+	public Pair[] getReach(Unit unitToCheck, int minRange, int maxRange) {
+		Pair initPos = unitToCheck.getPos();
+		return getReachFromPos(initPos, minRange, maxRange);
 	}
 	
 	public Pair[] getAttackSpaces(Unit unitToCheck) {

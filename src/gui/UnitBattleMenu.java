@@ -92,7 +92,7 @@ public class UnitBattleMenu {
 									returnGame.selectTrade();
 									break;
 								case ACTION_WAIT:
-									returnGame.moveAndUpdateSelection(gameCam.getSelectedGridPos());
+									returnGame.moveAndUpdateSelection(selectedUnit, gameCam.getSelectedGridPos());
 									break;
 							}
 							break;
@@ -109,7 +109,7 @@ public class UnitBattleMenu {
 		items = false;
 		itemMenu = null;
 		if(actionTaken) {
-			returnGame.moveAndUpdateSelection(gameCam.getSelectedGridPos());
+			returnGame.moveAndUpdateSelection(selectedUnit, gameCam.getSelectedGridPos());
 		}
 	}
 }

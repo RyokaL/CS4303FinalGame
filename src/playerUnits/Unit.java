@@ -72,6 +72,9 @@ public class Unit {
 	}
 	
 	public int addExp(int exp) {
+		if(team == Constants.ENEMY) {
+			return 0;
+		}
 		int levels = 0;
 		experiencePoints += exp;
 		while(experiencePoints >= 100) {
@@ -141,7 +144,7 @@ public class Unit {
 	
 	private void levelUp() {
 		level += 1;
-		for(int i = 0; i > stats.length; i++) {
+		for(int i = 0; i < stats.length; i++) {
 			if(pa.random(100) < assignedClass.getStatGrowth(i)) {
 				stats[i] = stats[i] + 1;
 			}
@@ -310,6 +313,12 @@ public class Unit {
 	}
 
 	public void damageWeapon() {
+		if(equipped == null) {
+			return;
+		}
+		if(team == Constants.ENEMY) {
+			return;
+		}
 		equipped.damage();
 		if(equipped.getDurability() <= 0) {
 			boolean found = false;

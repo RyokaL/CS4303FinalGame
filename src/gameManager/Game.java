@@ -16,8 +16,11 @@ import java.util.HashMap;
 
 import constants.Constants;
 import gui.BattleMenu;
+import gui.BattleResultsMenu;
 import gui.ItemMenu;
 import gui.UnitBattleMenu;
+import helpers.BattleObj;
+import helpers.BattleResult;
 import helpers.Pair;
 import helpers.Triple;
 import items.Blacksmith;
@@ -32,6 +35,7 @@ public class Game {
 	private final int ACTION_MENU = 1;
 	private final int PLAYER_MENU = 2;
 	private final int TRADE_MENU = 3;
+	private final int STATE_BATTLE = 4;
 	
 	private final int SELECT_NORMAL = 0;
 	private final int SELECT_ATTACK = 1;
@@ -61,6 +65,8 @@ public class Game {
 	private boolean unitSelected;
 	private Unit selectedUnit;
 	
+	private BattleResultsMenu lastBattle;
+	
 	private boolean showExtra = true;
 	
 	private Item tradeFirst;
@@ -72,6 +78,8 @@ public class Game {
 	
 	private int selectState = 0;
 	
+	private AIController ai;
+	
 	public Game(Map map, boolean red, boolean blue, boolean green, boolean yellow, int startTurn, final PApplet pa, ClassStore classes, Blacksmith weapons) {
 		this.pa = pa;
 		this.classes = classes;
@@ -81,6 +89,7 @@ public class Game {
 		this.blue = blue;
 		this.green = green;
 		this.yellow = yellow;
+		this.ai = new AIController();
 		
 		easyAccessMap = new Unit[map.getMap().length][map.getMap()[0].length];
 		
@@ -119,6 +128,11 @@ public class Game {
 		}
 		
 		enemy = new Player(Constants.ENEMY);
+		Unit enemyTest = new Unit(2, 2, classes.getClassObj("Tactician"), Constants.ENEMY, pa);
+		easyAccessMap[2][2] = enemyTest;
+		enemyTest.equipWeapon(weapons.getWeaponObj("Training Sword"));
+		enemyTest.addToInventory(weapons.getWeaponObj("Worn Bow"));
+		enemy.addUnit(enemyTest);
 		teams.add(rTeam); teams.add(bTeam); teams.add(gTeam); teams.add(yTeam); teams.add(enemy);
 		
 		loot = new HashMap<Pair, Resource>();
@@ -193,16 +207,28 @@ public class Game {
 						pa.fill(0, 200);
 						pa.rect(3* pa.width/4, pa.height/2 - 100, 250, 100);
 						
-						Triple damage = getDamage(selectedUnit, selected);
+						BattleObj damage = getDamage(selectedUnit, selected);
 						
 						pa.textAlign(PConstants.LEFT);
 						pa.fill(255);
 						pa.text(selectedUnit.getAssignedClass().getName(), 2* pa.width/4, pa.height/2);
 						pa.text(selected.getAssignedClass().getName(), 3* pa.width/4, pa.height/2);
 						pa.fill(0);
-						pa.text("Dmg: " + damage.x, 3* pa.width/4, pa.height/2 + 50);
-						pa.text("Hit: " + damage.y + "%", 2* pa.width/4, pa.height/2 + 100);
-						pa.text("Crit: " + damage.z + "%", 2* pa.width/4, pa.height/2 + 150);
+						if(damage.counter) {
+							String x2From = damage.x2From ? " x2" : "";
+							pa.text("Dmg: " + damage.damageFrom + x2From, 2* pa.width/4, pa.height/2 + 50);
+							pa.text("Hit: " + damage.hitFrom + "%", 3* pa.width/4, pa.height/2 + 100);
+							pa.text("Crit: " + damage.critFrom + "%", 3* pa.width/4, pa.height/2 + 150);
+						}
+						String x2To = damage.x2To ? " x2" : "";
+						if(damage.damageTo < 0) {
+							pa.text("Heal: " + (-damage.damageTo) + x2To, 3* pa.width/4, pa.height/2 + 50);
+						}
+						else {
+							pa.text("Dmg: " + damage.damageTo + x2To, 3* pa.width/4, pa.height/2 + 50);
+						}
+						pa.text("Hit: " + damage.hitTo + "%", 2* pa.width/4, pa.height/2 + 100);
+						pa.text("Crit: " + damage.critTo + "%", 2* pa.width/4, pa.height/2 + 150);
 						
 						pa.popMatrix();
 					}
@@ -286,6 +312,10 @@ public class Game {
 			tradeMenu.update();
 		}
 		
+		if(openMenuState == STATE_BATTLE) {
+			lastBattle.update(cam.getTransPos());
+		}
+		
 		//Key input
 		if(pa.keyPressed && openMenuState == NO_MENU) {
 			pa.keyPressed = false;
@@ -342,16 +372,8 @@ public class Game {
 	}
 	
 	private Unit isPosUnit() {
-		for(Player p : teams) {
-			if(p == null) {
-				continue;
-			}
-			Unit u;
-			if((u = p.getUnitAtPos(cam.getSelectedGridPos())) != null) {
-				return u;
-			}
-		}
-		return null;
+		Pair pos = cam.getSelectedGridPos();
+		return easyAccessMap[pos.x][pos.y];
 	}
 	
 	public int getWinner() {
@@ -432,6 +454,12 @@ public class Game {
 				u.setMoved(false);
 			}
 		}
+		
+		if(turn == Constants.ENEMY) {
+			for(Unit u : enemy.getUnits()) {
+				ai.getNextMove(u, easyAccessMap, map, this);
+			}
+		}
 		//TODO: Skip enemy turn camera movement for now, change to show movements
 		if(turn != Constants.ENEMY) {
 			Pair camNewTurnPos = teams.get(turn).getUnits().get(0).getPos();
@@ -470,6 +498,9 @@ public class Game {
 			spawnResources();
 			spawnEnemies();
 		}
+		if(turn == Constants.ENEMY) {
+			endCurrentTurn();
+		}
 	}
 	
 	public int getCurrentTurn() {
@@ -483,7 +514,7 @@ public class Game {
 	private Unit initUnit(int team) {
 		//This could maybe be altered?
 		String initialUnit = "Tactician";
-		String initialWeapon = "Worn Bow";
+		String initialWeapon = "Training Sword";
 		
 		UnitClass initClass = classes.getClassObj(initialUnit);
 		Weapon initWeapon = weapons.getWeaponObj(initialWeapon);
@@ -551,10 +582,24 @@ public class Game {
 						Unit toAttack;
 						if((toAttack = easyAccessMap[currentPos.x][currentPos.y]) != null) {
 							if(toAttack.getTeam() != turn) {
-								//TODO: Add a check for if using a healing weapon
-								attackUnit(toAttack);
+								BattleResult result = attackUnit(selectedUnit, toAttack, false);
+								lastBattle = new BattleResultsMenu(pa, result, this);
 								selectState = SELECT_NORMAL;
-								moveAndUpdateSelection(selectedUnit.getPos());
+								if(!result.atkDied) {
+									moveAndUpdateSelection(selectedUnit, selectedUnit.getPos());
+								}
+								if(result.atkDied && teams.get(turn).hasLost()) {
+									endCurrentTurn();
+								}
+								openMenuState = STATE_BATTLE;
+							}
+							if(toAttack.getTeam() == turn) {
+								if(toAttack.getEquipped() != null && toAttack.getEquipped().isHealing()) {
+									lastBattle = new BattleResultsMenu(pa, attackUnit(selectedUnit, toAttack, true), this);
+									selectState = SELECT_NORMAL;
+									moveAndUpdateSelection(selectedUnit, selectedUnit.getPos());
+									openMenuState = STATE_BATTLE;
+								}
 							}
 						}
 					}
@@ -605,19 +650,19 @@ public class Game {
 		
 	}
 	
-	public void moveAndUpdateSelection(Pair newPos) {
-		selectedUnit.setMoving(false);
-		easyAccessMap[selectedUnit.getPos().x][selectedUnit.getPos().y] = null;
-		selectedUnit.setNewPos(newPos.x, newPos.y);
-		selectedUnit.setMoved(true);
-		easyAccessMap[selectedUnit.getPos().x][selectedUnit.getPos().y] = selectedUnit;
+	public void moveAndUpdateSelection(Unit chosen, Pair newPos) {
+		chosen.setMoving(false);
+		easyAccessMap[chosen.getPos().x][chosen.getPos().y] = null;
+		chosen.setNewPos(newPos.x, newPos.y);
+		chosen.setMoved(true);
+		easyAccessMap[chosen.getPos().x][chosen.getPos().y] = chosen;
 		
 		//If the unit has moved to a spot with loot, collect it
 		if(loot.containsKey(newPos)) {
 			Resource obtained = loot.remove(newPos);
 			teams.get(turn).addGold(obtained.getGold());
 			if(obtained.hasLoot()) {
-				if(!selectedUnit.addToInventory(obtained.getLoot())) {
+				if(!chosen.addToInventory(obtained.getLoot())) {
 					//TODO: Do something? - make choose an item to remove?
 				}
 			}
@@ -641,67 +686,210 @@ public class Game {
 		openMenuState = NO_MENU;
 	}
 	
-	private Triple getDamage(Unit attack, Unit defend) {
-		int chanceToHit;
-		int critChance;
-		int damage;
+	public BattleObj getDamage(Unit attack, Unit defend) {
+		int chanceToHitAtk;
+		int critChanceAtk;
+		int damageAtk;
+		boolean x2Atk = false;
+		
+		boolean counter = false;
+		int chanceToHitDef;
+		int critChanceDef;
+		int damageDef;
+		boolean x2Def = false;
+		
+		//Attacker
 		if(attack.getEquipped() != null) {
-			chanceToHit = attack.getEquipped().getHitRate(); //Maybe alter this
-			critChance = (int) (attack.getEquipped().getCriticalRate() + 0.25 * attack.getStats()[Constants.DEX]);
+			chanceToHitAtk = attack.getEquipped().getHitRate(); //Maybe alter this
+			critChanceAtk = (int) (attack.getEquipped().getCriticalRate() + 0.25 * attack.getStats()[Constants.DEX]);
 			if(attack.getEquipped().getWeaponType() == Constants.MAGIC) {
-				damage = attack.getEquipped().getAttack() + attack.getStats()[Constants.MAG] - defend.getStats()[Constants.MDEF];
+				damageAtk = attack.getEquipped().getAttack() + attack.getStats()[Constants.MAG] - defend.getStats()[Constants.MDEF];
+			}
+			else if(attack.getEquipped().isHealing()) {
+				damageAtk = -(attack.getEquipped().getAttack() + (int)(0.5f * attack.getStats()[Constants.MAG]));
+				return new BattleObj(damageAtk, 0, chanceToHitAtk, x2Atk, false, 0, 0, 0, false);
 			}
 			else {
-				damage = attack.getEquipped().getAttack() + attack.getStats()[Constants.STR] - defend.getStats()[Constants.DEF];
+				damageAtk = attack.getEquipped().getAttack() + attack.getStats()[Constants.STR] - defend.getStats()[Constants.DEF];
+			}
+			
+			if(attack.getStats()[Constants.SPD] >= (defend.getStats()[Constants.SPD] + 5)) {
+				x2Atk = true;
+				x2Def = false;
 			}
 		}
 		else {
-			chanceToHit = 100;
-			critChance = 0;
-			damage = 1 + attack.getStats()[Constants.STR] - (int)(1.5f * defend.getStats()[Constants.DEF]);
+			chanceToHitAtk = 100;
+			critChanceAtk = 0;
+			damageAtk = 1 + attack.getStats()[Constants.STR] - (int)(1.5f * defend.getStats()[Constants.DEF]);
 		}
-		return new Triple(damage, chanceToHit, critChance);
+		
+		//Defender counter
+		//Check if can counter first
+		Pair[] defenderReach = map.getAttackSpaces(defend);
+		for(Pair p : defenderReach) {
+			if(p.equals(attack.getPos())) {
+				counter = true;
+				break;
+			}
+		}
+		
+		if(defend.getEquipped() != null) {
+			chanceToHitDef = defend.getEquipped().getHitRate(); //Maybe alter this
+			critChanceDef = (int) (defend.getEquipped().getCriticalRate() + 0.25 * defend.getStats()[Constants.DEX]);
+			if(defend.getEquipped().getWeaponType() == Constants.MAGIC) {
+				damageDef = defend.getEquipped().getAttack() + defend.getStats()[Constants.MAG] - attack.getStats()[Constants.MDEF];
+			}
+			else {
+				damageDef = defend.getEquipped().getAttack() + defend.getStats()[Constants.STR] - attack.getStats()[Constants.DEF];
+			}
+			
+			if(defend.getStats()[Constants.SPD] >= (attack.getStats()[Constants.SPD] + 5)) {
+				x2Def = true;
+				x2Atk = false;
+			}
+		}
+		else {
+			chanceToHitDef = 100;
+			critChanceDef = 0;
+			damageDef = 1 + defend.getStats()[Constants.STR] - (int)(1.5f * attack.getStats()[Constants.DEF]);
+		}
+		if(damageAtk < 0) {
+			damageAtk = 0;
+		}
+		if(damageDef < 0) {
+			damageDef = 0;
+		}
+		return new BattleObj(damageAtk, critChanceAtk, chanceToHitAtk, x2Atk, counter, damageDef, critChanceDef, chanceToHitDef, x2Def);
 	}
 	
-	public void attackUnit(Unit other) {
-		int chanceToHit;
-		int critChance;
-		int damage;
-		if(selectedUnit.getEquipped() != null) {
-			chanceToHit = selectedUnit.getEquipped().getHitRate(); //Maybe alter this
-			critChance = (int) (selectedUnit.getEquipped().getCriticalRate() + 0.25 * selectedUnit.getStats()[Constants.DEX]);
-			if(selectedUnit.getEquipped().getWeaponType() == Constants.MAGIC) {
-				damage = selectedUnit.getEquipped().getAttack() + selectedUnit.getStats()[Constants.MAG] - other.getStats()[Constants.MDEF];
-			}
-			else {
-				damage = selectedUnit.getEquipped().getAttack() + selectedUnit.getStats()[Constants.STR] - other.getStats()[Constants.DEF];
-			}
-		}
-		else {
-			chanceToHit = 100;
-			critChance = 0;
-			damage = 1 + selectedUnit.getStats()[Constants.STR] - (int)(1.5f * other.getStats()[Constants.DEF]);
-		}
-		//TODO: Do stuff with follow-up attacks && counters and other damage bonuses
+	public BattleResult attackUnit(Unit attack, Unit other, boolean heal) {
+		BattleResult result = new BattleResult();
+		result.attacker = attack.getAssignedClass().getName();
+		result.defender = other.getAssignedClass().getName();
 		
-		if(damage < 0) {
-			damage = 0;
-		}
+		result.atk = attack;
+		result.def = other;
 		
-		if(pa.random(100) > chanceToHit) {
-			damage = 0;
+		result.preStatsAtk = attack.getStats();
+		result.preStatsDef = other.getStats();
+		
+		BattleObj battleResult = getDamage(attack, other);
+		//Do initial attack
+		if(pa.random(100) > battleResult.hitTo) {
+			result.atkFirstHit = false;
+			battleResult.damageTo = 0;
+			//Missed message!
 		}
-		if(pa.random(100) < critChance) {
-			damage = damage * 3;
+		if(pa.random(100) < battleResult.critTo && !heal) {
+			result.atkFirstCrit = true;
+			battleResult.damageTo *= 3;
 		}		
-		other.takeDamage(damage);
-		
-		selectedUnit.damageWeapon();
+		other.takeDamage(battleResult.damageTo);
+		attack.damageWeapon();
+		result.damageDealtAtkFirst = battleResult.damageTo;
+		result.expGainedAtk += (int)(battleResult.damageTo * 2.5);
 		
 		if(other.getHealthPoints() <= 0) {
 			teams.get(other.getTeam()).removeUnit(other);
 			easyAccessMap[other.getPos().x][other.getPos().y] = null;
+			result.defDied = true;
+			result.expGainedAtk += 150;
+			result.atkLevelUp = attack.addExp(result.expGainedAtk);
+			return result;
 		}
+		
+		//If counter do other attack:
+		if(battleResult.counter) {
+			result.counter = true;
+			result.defFirstHit = true;
+			if(pa.random(100) > battleResult.hitFrom) {
+				result.defFirstHit = false;
+				battleResult.damageFrom = 0;
+				//Missed message!
+			}
+			if(pa.random(100) < battleResult.critFrom) {
+				result.defFirstCrit = true;
+				battleResult.damageFrom *= 3;
+			}		
+			attack.takeDamage(battleResult.damageFrom);
+			other.damageWeapon();
+			result.damageDealtDefFirst = battleResult.damageTo;
+			result.expGainedDef += (int)(battleResult.damageFrom * 2.5);
+			
+			if(attack.getHealthPoints() <= 0) {
+				result.atkDied = true;
+				teams.get(attack.getTeam()).removeUnit(attack);
+				easyAccessMap[attack.getPos().x][attack.getPos().y] = null;
+				result.expGainedDef += 150;
+				result.defLevelUp = other.addExp(result.expGainedDef);
+				return result;
+			}
+		}
+		
+		//Now check if anyone can attack twice
+		if(battleResult.x2To) {
+			result.atk2 = true;
+			result.atkSecondHit = true;
+			if(result.atkFirstCrit) {
+				battleResult.damageTo /= 3;
+			}
+			if(pa.random(100) > battleResult.hitTo) {
+				result.atkSecondHit = false;
+				 battleResult.damageTo = 0;
+				 //Missed message!
+			}
+			if(pa.random(100) < battleResult.critTo) {
+				result.atkSecondCrit = true;
+				battleResult.damageTo *= 3;
+			}		
+			other.takeDamage(battleResult.damageTo);
+			attack.damageWeapon();
+			result.damageDealtAtkSecond = battleResult.damageTo;
+			result.expGainedAtk += (int)(battleResult.damageTo * 2.5);
+			
+			if(other.getHealthPoints() <= 0) {
+				result.defDied = true;
+				teams.get(other.getTeam()).removeUnit(other);
+				easyAccessMap[other.getPos().x][other.getPos().y] = null;
+				result.expGainedAtk += 150;
+				result.atkLevelUp = attack.addExp(result.expGainedAtk);
+				return result;
+			}
+		}
+		
+		if(battleResult.x2From) {
+			result.def2 = true;
+			result.defSecondHit = true;
+			if(result.defFirstCrit) {
+				battleResult.damageFrom /= 3;
+			}
+			if(pa.random(100) > battleResult.hitFrom) {
+				result.defSecondHit = false;
+				 battleResult.damageFrom = 0;
+				 //Missed message!
+			}
+			if(pa.random(100) < battleResult.critFrom) {
+				result.defSecondCrit = true;
+				battleResult.damageFrom *= 3;
+			}		
+			attack.takeDamage(battleResult.damageFrom);
+			other.damageWeapon();
+			result.damageDealtDefSecond = battleResult.damageFrom;
+			result.expGainedDef += (int)(battleResult.damageFrom * 2.5);
+			
+			if(attack.getHealthPoints() <= 0) {
+				result.atkDied = true;
+				teams.get(attack.getTeam()).removeUnit(attack);
+				easyAccessMap[attack.getPos().x][attack.getPos().y] = null;
+				result.expGainedDef += 150;
+				result.defLevelUp = other.addExp(result.expGainedDef);
+				return result;
+			}
+		}
+		result.defLevelUp = other.addExp(result.expGainedDef);
+		result.atkLevelUp = attack.addExp(result.expGainedAtk);
+		return result;
 	}
 	
 	public void cancelSelection() {

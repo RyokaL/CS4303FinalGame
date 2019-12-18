@@ -28,8 +28,8 @@ public class UnitClass {
 	}
 	
 	public void loadSprites( final PApplet pa) {
-		this.sprites = new PImage[4];
-		for(int i = 0; i < 4; i++) {
+		this.sprites = new PImage[5];
+		for(int i = 0; i < 5; i++) {
 			sprites[i] = pa.loadImage(spritePaths[i]);
 		}
 	}
