@@ -163,7 +163,7 @@ public class Game {
 		
 		//Check if selected tile is a unit and draw reach:
 		//TODO: Make better :)
-		System.out.println(map.getMap().length + " " + map.getMap()[0].length);
+		System.out.println(map.getTileAtPos(cam.getSelectedGridPos()).getName());
 		Unit selected;
 		if(unitSelected) {
 			if(selectState == SELECT_ATTACK) {

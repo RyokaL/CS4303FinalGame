@@ -269,6 +269,17 @@ public class Map {
 
 	public void loadMap(final PApplet pa) {
 		mapImg = pa.loadImage(mapPath);
+		fixMapRep();
+	}
+	
+	private void fixMapRep() {
+		int[][] newMap = new int[map[0].length][map.length];
+		for(int i = 0; i < map.length; i++) {
+			for(int j = 0; j < map[0].length; j++) {
+				newMap[j][i] = map[i][j];
+			}
+		}
+		map = newMap;
 	}
 	
 	public void loadTiles() {
