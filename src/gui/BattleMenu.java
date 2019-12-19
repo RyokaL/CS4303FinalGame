@@ -95,7 +95,7 @@ public class BattleMenu {
 									//Bring up unit list info
 									break;
 								case ACTION_ADD_UNITS:
-									//Bring up purchase screen
+									returnGame.showPurchaseMenu();
 									break;
 								case ACTION_END_TURN:
 									returnGame.endCurrentTurn();

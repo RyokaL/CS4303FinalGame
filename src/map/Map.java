@@ -115,14 +115,18 @@ public class Map {
 				int mapTile = map[t.y + 1][t.z];
 				int movement;
 				if(unitMap[t.y + 1][t.z] != null && unitMap[t.y + 1][t.z].getTeam() != unitToCheck.getTeam()) {
-					movement = 1;
+					movement = -1;
 				}
 				else {
 					movement = getTileEffects(unitToCheck, mapTile);
 				}
 				
-				if(movement != 1) {
-					spacesToCheck.add(new Triple(t.x -(1 + movement), t.y + 1, t.z));
+				if(movement != -1) {
+					int adjustedMove = -(1 + movement);
+					if(t.x + adjustedMove < 0 && t.x > 0) {
+						adjustedMove = -t.x;
+					}
+					spacesToCheck.add(new Triple(t.x + adjustedMove, t.y + 1, t.z));
 				}
 			}
 			//Check x - 1;
@@ -130,14 +134,18 @@ public class Map {
 				int mapTile = map[t.y - 1][t.z];
 				int movement;
 				if(unitMap[t.y - 1][t.z] != null && unitMap[t.y - 1][t.z].getTeam() != unitToCheck.getTeam()) {
-					movement = 1;
+					movement = -1;
 				}
 				else {
 					movement = getTileEffects(unitToCheck, mapTile);
 				}
 				
-				if(movement != 1) {
-					spacesToCheck.add(new Triple(t.x -(1 + movement), t.y - 1, t.z));
+				if(movement != -1) {
+					int adjustedMove = -(1 + movement);
+					if(t.x + adjustedMove < 0 && t.x > 0) {
+						adjustedMove = -t.x;
+					}
+					spacesToCheck.add(new Triple(t.x + adjustedMove, t.y - 1, t.z));
 				}
 			}
 			//Check y + 1;
@@ -145,14 +153,18 @@ public class Map {
 				int mapTile = map[t.y][t.z + 1];
 				int movement;
 				if(unitMap[t.y][t.z + 1] != null && unitMap[t.y][t.z + 1].getTeam() != unitToCheck.getTeam()) {
-					movement = 1;
+					movement = -1;
 				}
 				else {
 					movement = getTileEffects(unitToCheck, mapTile);
 				}
 				
-				if(movement != 1) {
-					spacesToCheck.add(new Triple(t.x -(1 + movement), t.y, t.z + 1));
+				if(movement != -1) {
+					int adjustedMove = -(1 + movement);
+					if(t.x + adjustedMove < 0 && t.x > 0) {
+						adjustedMove = -t.x;
+					}
+					spacesToCheck.add(new Triple(t.x + adjustedMove, t.y, t.z + 1));
 				}
 			}
 			//Check y - 1;
@@ -160,14 +172,18 @@ public class Map {
 				int mapTile = map[t.y][t.z - 1];
 				int movement;
 				if(unitMap[t.y][t.z - 1] != null && unitMap[t.y][t.z - 1].getTeam() != unitToCheck.getTeam()) {
-					movement = 1;
+					movement = -1;
 				}
 				else {
 					movement = getTileEffects(unitToCheck, mapTile);
 				}
 				
-				if(movement != 1) {
-					spacesToCheck.add(new Triple(t.x -(1 + movement), t.y, t.z - 1));
+				if(movement != -1) {
+					int adjustedMove = -(1 + movement);
+					if(t.x + adjustedMove < 0 && t.x > 0) {
+						adjustedMove = -t.x;
+					}
+					spacesToCheck.add(new Triple(t.x + adjustedMove, t.y, t.z - 1));
 				}
 			}
 		}
@@ -207,7 +223,7 @@ public class Map {
 			int affectedMovement = currTile.getAffectMove();
 			switch (currTile.getAffectedUnits()) {
 				case Constants.AFFECT_ALL:
-					return currTile.getAffectMove();
+					return affectedMovement;
 				case Constants.AFFECT_GROUND_UNITS:
 					return (unitMount == Constants.NO_MOUNT || unitMount == Constants.GROUND_MOUNT) ? affectedMovement : 0;
 				case Constants.AFFECT_MOUNTED:
@@ -220,7 +236,7 @@ public class Map {
 					return 0;
 			}
 		}
-		return 1;
+		return -1;
 	}
 	
 	public String getName() {
@@ -265,6 +281,20 @@ public class Map {
 
 	public Pair getYellowStartPos() {
 		return yellowStartPos;
+	}
+	
+	public Pair getStartPos(int team) {
+		switch(team) {
+			case Constants.RED:
+				return redStartPos;
+			case Constants.BLUE:
+				return blueStartPos;
+			case Constants.GREEN:
+				return greenStartPos;
+			case Constants.YELLOW:
+				return yellowStartPos;
+		}
+		return null;
 	}
 
 	public void loadMap(final PApplet pa) {

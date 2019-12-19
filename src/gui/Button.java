@@ -140,4 +140,8 @@ public class Button {
 	public void setHighlighted() {
 		mouseOver = !mouseOver;
 	}
+
+	public boolean isHighlighted() {
+		return mouseOver;
+	}
 }

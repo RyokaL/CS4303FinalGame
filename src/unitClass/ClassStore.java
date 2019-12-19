@@ -59,7 +59,19 @@ public class ClassStore {
 		return classList.get(className);
 	}
 	
+	public List<UnitClass> getClasses() {
+		return classList.values().stream().collect(Collectors.toList());
+	}
+	
 	public Set<String> getClassNames() {
 		return classList.keySet();
+	}
+	
+	public int getMaxStrength() {
+		return maxStrength;
+	}
+	
+	public ArrayList<UnitClass> getStage(int stage) {
+		return classStageTable.get(stage);
 	}
 }

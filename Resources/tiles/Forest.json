@@ -6,5 +6,7 @@
 	"heal" : false,
 	"healPercent" : 0,
 	"trap" : false,
-	"damagePercent" : 0
+	"damagePercent" : 0,
+	"defUp": 1,
+	"avoidPercent": 20
 }

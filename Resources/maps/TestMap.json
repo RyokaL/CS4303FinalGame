@@ -1,7 +1,7 @@
 {
 	"name" : "Simple Map",
 	"tileNames" : ["Plains","Forest","River","Mountains","Ruins","Bridge","Heal Tile","Spikes"],
-	"mapPath" : "Resources/mapImages/SimpleMap.png",
+	"mapPath" : "Resources/mapImages/SimpleMap2.png",
 	"map" : [[3,3,3,3,2,0,0,0,0,0,0,0,0,0,0,0],
 			 [3,3,3,0,2,0,0,0,0,0,0,0,0,0,0,0],
 			 [3,0,0,0,0,2,0,0,0,0,0,0,0,0,0,0],
@@ -18,8 +18,8 @@
 			 [4,0,4,0,0,0,0,2,0,0,0,7,0,0,0,7],
 			 [0,6,0,0,0,0,0,2,2,2,2,0,0,0,0,0],
 			 [4,0,4,0,0,0,0,2,2,2,2,2,0,0,0,0]],
-	"mapStartPosX" : 100,
-	"mapStartPosY" : 100,
+	"mapStartPosX" : 550,
+	"mapStartPosY" : 550,
 	"tileSize" : 50,
 	"redStartPos" : {
 		"x" : 0,

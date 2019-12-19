@@ -7,14 +7,14 @@ import processing.core.PVector;
 
 public class Camera {
 	
+	private final float yPosOffset = 0;
+	private final float xPosOffset = 0;
+	
 	private PVector actualPos;
 	private Pair gridPos;
 	private float tileSize;
 	
 	private float initActPosX, initActPosY;
-	
-	//TODO: Maybe add some default offset for UI elements?
-	
 	private final PApplet pa;
 	
 	public Camera(int initGridX, int initGridY, float tileSize, float initActPosX, float initActPosY, final PApplet pa) {
@@ -39,7 +39,7 @@ public class Camera {
 	}
 	
 	public PVector getTransPos() {
-		return new PVector(-(-2* initActPosX + actualPos.x - tileSize/2), -(-2* initActPosY + actualPos.y - tileSize/2));
+		return new PVector(-(-2* initActPosX + actualPos.x - tileSize/2 - xPosOffset), -(-2* initActPosY + actualPos.y - tileSize/2 - yPosOffset));
 	}
 	
 	public Pair getSelectedGridPos() {
@@ -53,7 +53,7 @@ public class Camera {
 	public void drawSelectedGrid() {
 		//TODO: Change these to actual colours
 		pa.stroke(255);
-		pa.fill(255);
+		pa.fill(255, 100);
 		pa.rect(actualPos.x - tileSize / 2 - initActPosX, actualPos.y - tileSize / 2 - initActPosY, tileSize, tileSize);
 	}
 }

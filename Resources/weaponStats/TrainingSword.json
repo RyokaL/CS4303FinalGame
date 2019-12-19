@@ -8,5 +8,6 @@
 	"durability" : 10,
 	"healing" : false,
 	"weaponType" : 0,
-	"rarity" : 0
+	"rarity" : 0,
+	"cost" : 50
 }

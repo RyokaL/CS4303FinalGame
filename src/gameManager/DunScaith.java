@@ -8,6 +8,7 @@ import items.Blacksmith;
 import map.MapStore;
 import map.TileSetStore;
 import processing.core.PApplet;
+import processing.core.PConstants;
 import unitClass.ClassStore;
 
 public class DunScaith extends PApplet {
@@ -17,6 +18,8 @@ public class DunScaith extends PApplet {
 	MapStore maps;
 	
 	private int gameState = Constants.STATE_MAIN_MENU;
+	
+	private int lastWinner = -1;
 	
 	private MainMenu main;
 	private SetUp setup;
@@ -40,10 +43,6 @@ public class DunScaith extends PApplet {
 			weapons = new Blacksmith("Resources/weaponStats", "Resources/useItems", this);
 			tiles = new TileSetStore("Resources/tiles", this);
 			maps = new MapStore("Resources/maps", this);
-			System.out.println(classes.getClassNames());
-			System.out.println(weapons.getWeaponNames());
-			System.out.println(tiles.getTileNames());
-			System.out.println(maps.getMapNames());
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -63,6 +62,9 @@ public class DunScaith extends PApplet {
     		case Constants.STATE_GAME:
     			updateGame();
     			break;
+    		case Constants.STATE_END:
+    			endGame();
+    			break;
     		default:
     			background(0);
     			break;
@@ -71,6 +73,39 @@ public class DunScaith extends PApplet {
     
     private void updateGame() {
     	activeGame.update();
+    	if((lastWinner = activeGame.getWinState()) != -1) {
+    		gameState = Constants.STATE_END;
+    	}
+    }
+    
+    private void endGame() {
+    	String winner = "";
+    	switch(lastWinner) {
+    		case Constants.RED:
+    			winner = "Red Team";
+    			break;
+    		case Constants.BLUE:
+    			winner = "Blue Team";
+    			break;
+    		case Constants.GREEN:
+    			winner = "Green Team";
+    			break;
+    		case Constants.YELLOW:
+    			winner = "Yellow Team";
+    			break;
+    		case Constants.ENEMY:
+    			winner = "... no-one";
+    			break;
+    	}
+    	textSize(32);
+    	textAlign(PConstants.CENTER);
+    	fill(255);
+    	text("The winner is... ", width/2, 0.2f * height);
+    	fill(Constants.TEAM_COLOURS[lastWinner]);
+    	text(winner, width/2, height/2);
+    	fill(255);
+    	text("...Press Any Key to Continue...", width/2, height * 0.8f);
+    	textSize(12);
     }
     
     private void drawMainMenu() {
@@ -97,6 +132,8 @@ public class DunScaith extends PApplet {
     }
     
     public void keyPressed() {
-    	
+    	if(gameState == Constants.STATE_END) {
+    		gameState = Constants.STATE_MAIN_MENU;
+    	}
     }
 }

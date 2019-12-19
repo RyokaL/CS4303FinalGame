@@ -335,4 +335,18 @@ public class Unit {
 			}
 		}
 	}
+	
+	public String toString() {
+		String info = "Str: " + stats[Constants.STR] + "\n"
+				+ "Mag: " + stats[Constants.MAG] + "\n"
+				+ "Def: " + stats[Constants.DEF] + "\n"
+				+ "MDef: " + stats[Constants.MDEF] + "\n"
+				+ "Dex: " + stats[Constants.DEX] + "\n"
+				+ "Spd: " + stats[Constants.SPD] + "\n";
+		info = info + "Weapons: \n";
+		for(int i : assignedClass.getEquipableWeapons()) {
+			info = info + Constants.WEAPON_TYPES[i] + "\n";
+		}
+		return info;
+	}
 }

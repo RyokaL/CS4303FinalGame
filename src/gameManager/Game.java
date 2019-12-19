@@ -13,11 +13,14 @@ import unitClass.UnitClass;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
+import java.util.stream.Collectors;
 
 import constants.Constants;
 import gui.BattleMenu;
 import gui.BattleResultsMenu;
 import gui.ItemMenu;
+import gui.PurchaseMenu;
 import gui.UnitBattleMenu;
 import helpers.BattleObj;
 import helpers.BattleResult;
@@ -36,13 +39,36 @@ public class Game {
 	private final int PLAYER_MENU = 2;
 	private final int TRADE_MENU = 3;
 	private final int STATE_BATTLE = 4;
+	private final int STATE_BUY = 5;
+	private final int STATE_NEXT_TURN = 6;
 	
 	private final int SELECT_NORMAL = 0;
 	private final int SELECT_ATTACK = 1;
 	private final int SELECT_TRADE = 2;
+	
+	private final int BASE_ENEMY_SPAWN = 35;
+	private final int INC_ENEMY_SPAWN = 10;
+	private final int COOLDOWN_ENEMY_SPAWN = 2; //no of turns
+	
+	private final int BASE_ITEM_SPAWN = 10;
+	private final int INC_ITEM_SPAWN = 5;
+	private final int COOLDOWN_ITEM_SPAWN = 5; //no of turns
+	
+	private final int LOOT_CHANCE = 30;
+	
+	private int enemySpawnChance = BASE_ENEMY_SPAWN;
+	private int enemySpawnCooldown = 0;
+	
+	private int itemSpawnChance = BASE_ITEM_SPAWN;
+	private int itemSpawnCooldown = 0;
+	
+	private int difficulty = 0;
+	private int wepDifficulty = 0;
+	
 	private UnitBattleMenu unitMenu = null;
 	private BattleMenu playerMenu = null;
 	private ItemMenu tradeMenu = null;
+	private PurchaseMenu buyMenu = null;
 	
 	private Player rTeam, bTeam, gTeam, yTeam, enemy;
 	private ArrayList<Player> teams = new ArrayList<Player>(5);
@@ -77,6 +103,10 @@ public class Game {
 	private int openMenuState = 0;
 	
 	private int selectState = 0;
+	
+	private int selectedUnitIndex = 0;
+	
+	private int winState = -1;
 	
 	private AIController ai;
 	
@@ -143,6 +173,14 @@ public class Game {
 		return cam;
 	}
 	
+	public Unit getHoverUnit() {
+		return isPosUnit();
+	}
+	
+	public Unit getSelectedUnit() {
+		return selectedUnit;
+	}
+	
 	public void update() {
 		//Draw map/units etc here
 		PVector gameCamPos = cam.getTransPos();
@@ -157,13 +195,8 @@ public class Game {
 		//Draw selected tile:
 		cam.drawSelectedGrid();
 		
-		//Current turn - move to UI
-		pa.fill(255);
-		pa.text(turn, pa.width/2, pa.height/2);
-		
 		//Check if selected tile is a unit and draw reach:
 		//TODO: Make better :)
-		System.out.println(map.getTileAtPos(cam.getSelectedGridPos()).getName());
 		Unit selected;
 		if(unitSelected) {
 			if(selectState == SELECT_ATTACK) {
@@ -177,16 +210,21 @@ public class Game {
 			else {
 				Pair[] toDraw = selectedUnit.getMoveableSpaces();
 				pa.fill(0x441f75ff);
+				if(toDraw == null) {
+					toDraw = map.getMovementSpaces(selectedUnit, easyAccessMap);
+					selectedUnit.setSpacesNewTurn(toDraw);
+				}
 				for(Pair p : toDraw) {
 					Triple t = cam.convertToDrawPos(p);
 					pa.rect(t.X, t.Y, t.Z, t.Z);
 				}
+				
 			}
 		}
 		if((selected = isPosUnit()) != null) {
 			if(selectState == SELECT_ATTACK) {
 				if(selectedUnit.getEquipped() != null && selectedUnit.getEquipped().isHealing() && selected.getTeam() == selectedUnit.getTeam()) {
-					//display info on healing changes
+					//TODO: display info on healing changes
 				}
 				else if(selected.getTeam() != selectedUnit.getTeam()) {
 					if(showExtra) {
@@ -245,7 +283,7 @@ public class Game {
 					pa.translate(-currTrans.x, -currTrans.y);
 					
 					pa.fill(255, 200);
-					pa.rect(3* pa.width/4, pa.height/2, 250, 250);
+					pa.rect(3* pa.width/4, pa.height/2, 250, 350);
 					pa.fill(0, 200);
 					pa.rect(3* pa.width/4, pa.height/2 - 100, 250, 100);
 					
@@ -253,9 +291,11 @@ public class Game {
 					pa.fill(255);
 					pa.text(selected.getAssignedClass().getName(), 3* pa.width/4, pa.height/2);
 					pa.fill(0);
-					pa.text("Lv. "  + selected.getLevel(), 3* pa.width/4, pa.height/2 + 50);
-					pa.text("HP: " + selected.getHealthPoints() + "/" + selected.getStats()[Constants.HP], 3* pa.width/4, pa.height/2 + 100);
-					
+					pa.text("Lv. "  + selected.getLevel(), 3* pa.width/4, pa.height/2 + 25);
+					pa.text("HP: " + selected.getHealthPoints() + "/" + selected.getStats()[Constants.HP], 3* pa.width/4, pa.height/2 + 50);
+					pa.textSize(14);
+					pa.text(selected.toString(), 3* pa.width/4, pa.height/2 + 70);
+					pa.textSize(32);
 					pa.popMatrix();
 				}
 			}
@@ -274,23 +314,71 @@ public class Game {
 				
 				PImage sprite = u.getAssignedClass().getSprite(i);
 				
-				pa.image(sprite, actXPos + sprite.width/4, actYPos + sprite.height/4);
-				
-				//Draw health bars
-				pa.fill(10);
-				pa.stroke(10);
-				pa.rect(actXPos + sprite.width/4, actYPos + sprite.height * 1.25f, 25, 5);
-				
-				if(i == turn) {
-					pa.fill(0xFF22ff12);
+				if(sprite != null) {
+					pa.image(sprite, actXPos + sprite.width/4, actYPos + sprite.height/4);
+					//Draw health bars
+					pa.fill(10);
+					pa.stroke(10);
+					pa.rect(actXPos + sprite.width/4, actYPos + sprite.height * 1.25f, 40, 7);
+					
+					if(i == turn) {
+						pa.fill(0xFF22ff12);
+					}
+					else {
+						pa.fill(0xFFdb0000);
+					}
+					pa.stroke(0);
+					float healthPercentage = 40 * ((float)u.getHealthPoints()/(float)u.getStats()[Constants.HP]);
+					pa.rect(actXPos + sprite.width/4, actYPos + sprite.height * 1.25f + 0.5f, healthPercentage, 6);
 				}
 				else {
-					pa.fill(0xFFdb0000);
+					pa.fill(Constants.TEAM_COLOURS[u.getTeam()]);
+					pa.rect(actXPos - map.getTileSize()/2, actYPos -map.getTileSize()/2, map.getTileSize()/2, map.getTileSize()/2);
+					//Draw health bars
+					pa.fill(10);
+					pa.stroke(10);
+					pa.rect(actXPos +  map.getTileSize()/4, actYPos +  map.getTileSize() * 1.25f, 40, 7);
+					
+					if(i == turn) {
+						pa.fill(0xFF22ff12);
+					}
+					else {
+						pa.fill(0xFFdb0000);
+					}
+					pa.stroke(0);
+					float healthPercentage = 40 * ((float)u.getHealthPoints()/(float)u.getStats()[Constants.HP]);
+					pa.rect(actXPos + map.getTileSize()/4, actYPos + map.getTileSize() * 1.25f + 0.5f, healthPercentage, 6);
 				}
-				pa.noStroke();
-				float healthPercentage = 25 * ((float)u.getHealthPoints()/(float)u.getStats()[Constants.HP]);
-				pa.rect(actXPos + sprite.width/4, actYPos + sprite.height * 1.25f + 0.5f, healthPercentage, 4);
 			}
+		}
+		
+		for(Resource r : loot.values()) {
+			Pair rPos = r.getPos();
+			float tileSize = map.getTileSize();
+			float actXPos = (rPos.x * tileSize);
+			float actYPos = (rPos.y * tileSize);
+			
+			pa.fill(0xFF693400);
+			pa.rect(actXPos + tileSize/4, actYPos + tileSize/4, tileSize/2, tileSize/2);
+		}
+		
+		//Draw current tile info:
+		Tile selectedTile = map.getTileAtPos(cam.getSelectedGridPos());
+		if(showExtra) {
+			pa.pushMatrix();
+			PVector currTrans = cam.getTransPos();
+			pa.translate(-currTrans.x, -currTrans.y);
+			
+			pa.fill(255, 200);
+			pa.rect(pa.width - 200, 0, 200, 100);
+			pa.fill(0);
+			pa.textAlign(PConstants.LEFT, PConstants.TOP);
+			pa.textSize(12);
+			pa.text(selectedTile.toString(), pa.width - 200, 30);
+			pa.textSize(26);
+			pa.text(selectedTile.getName(), pa.width - 200, 0);
+			pa.popMatrix();
+			pa.textSize(32);
 		}
 		
 		//Add some sign unit is selected
@@ -311,6 +399,48 @@ public class Game {
 		
 		if(openMenuState == STATE_BATTLE) {
 			lastBattle.update(cam.getTransPos());
+		}
+		
+		if(openMenuState == STATE_BUY) {
+			buyMenu.update();
+		}
+		
+		if(openMenuState == STATE_NEXT_TURN) {
+			pa.pushMatrix();
+			PVector currTrans = cam.getTransPos();
+			pa.translate(-currTrans.x, -currTrans.y);
+			pa.fill(0, 200);
+			pa.rect(0, 0, pa.width, pa.height);
+			
+			String nextTurn = "";
+	    	switch(turn) {
+	    		case Constants.RED:
+	    			nextTurn = "Red Team";
+	    			break;
+	    		case Constants.BLUE:
+	    			nextTurn = "Blue Team";
+	    			break;
+	    		case Constants.GREEN:
+	    			nextTurn = "Green Team";
+	    			break;
+	    		case Constants.YELLOW:
+	    			nextTurn = "Yellow Team";
+	    			break;
+	    		case Constants.ENEMY:
+	    			nextTurn = "Enemy Team";
+	    			break;
+	    	}
+	    	
+	    	pa.fill(Constants.TEAM_COLOURS[turn]);
+	    	pa.textAlign(PConstants.CENTER);
+	    	pa.text(nextTurn + "'s Turn \n Press any key", pa.width/2, pa.height/2);
+			
+			pa.popMatrix();
+		}
+		
+		if(pa.keyPressed && openMenuState == STATE_NEXT_TURN) {
+			pa.keyPressed = false;
+			openMenuState = NO_MENU;
 		}
 		
 		//Key input
@@ -346,9 +476,22 @@ public class Game {
 						break;
 					case 'a':
 						//Move to previous unmoved unit
+						Player current = teams.get(turn);
+						List<Unit> toMove = current.getUnmovedUnits();
+						selectedUnitIndex -= 1;
+						if(selectedUnitIndex < 0) {
+							selectedUnitIndex = toMove.size() - 1;
+						}
+						Pair next = toMove.get(selectedUnitIndex).getPos();
+						cam.updateGridPos(next.x, next.y);
 						break;
 					case 'd':
 						//Move to next unmoved unit
+						Player currentD = teams.get(turn);
+						List<Unit> toMoveD = currentD.getUnmovedUnits();
+						selectedUnitIndex = (selectedUnitIndex + 1) % (toMoveD.size());
+						Pair nextD = toMoveD.get(selectedUnitIndex).getPos();
+						cam.updateGridPos(nextD.x, nextD.y);
 						break;
 					case 's':
 						showExtra = !showExtra;
@@ -362,10 +505,132 @@ public class Game {
 	
 	private void spawnResources() {
 		//TODO: Spawn in resources
+		if(itemSpawnCooldown <= 0 && pa.random(100) < itemSpawnChance) {
+			int posX;
+			int posY;
+			
+			//Pick random pos without a resource
+			posX = (int)pa.random(easyAccessMap.length);
+			posY = (int)pa.random(easyAccessMap[0].length);
+			Pair pos = new Pair(posX, posY);
+			if(!loot.containsKey(pos)) {
+				int gold = (int)pa.random(100 * (wepDifficulty + 1));
+				if(pa.random(100) < LOOT_CHANCE) {
+					//pick weapon
+					int wepDiff = (int)pa.random(wepDifficulty + 1);
+					ArrayList<Weapon> wepsRand = weapons.getRarityList(wepDiff);
+					int weaponPick = (int)pa.random(wepsRand.size());
+					loot.put(pos, new Resource(gold, pos.x, pos.y, wepsRand.get(weaponPick)));
+				}
+				else {
+					loot.put(pos, new Resource(gold, pos.x, pos.y));
+				}
+				itemSpawnCooldown = COOLDOWN_ITEM_SPAWN;
+				itemSpawnChance = BASE_ITEM_SPAWN;
+			}
+		}
+		else {
+			if(itemSpawnCooldown <= 0) {
+				itemSpawnChance += INC_ITEM_SPAWN;
+			}
+			else {
+				itemSpawnCooldown -= 1;
+			}
+		}
 	}
 	
 	private void spawnEnemies() {
-		//TODO: Spawn in enemies
+		//Roll to spawn
+		if(enemySpawnCooldown <= 0 && pa.random(100) < enemySpawnChance) {
+			int posX;
+			int posY;
+			
+			//Pick class to spawn
+			int randomDiff = (int)pa.random(difficulty + 1);
+			ArrayList<UnitClass> diffClasses = classes.getStage(randomDiff);
+			int randClass = (int)pa.random(diffClasses.size());
+			UnitClass toSpawn = diffClasses.get(randClass);
+			
+			while(true) {
+				posX = (int)pa.random(easyAccessMap.length);
+				posY = (int)pa.random(easyAccessMap[0].length);
+				if(easyAccessMap[posX][posY] == null) {
+					Tile currTile = map.getTileAtPos(new Pair(posX, posY));
+					int occupy = currTile.getUnitsCanOccupy();
+					int mount = toSpawn.getMounted();
+					boolean goodSpaceAndClass = false;
+					switch(occupy) {
+						case Constants.AFFECT_ALL:
+							goodSpaceAndClass = true;
+							break;
+						case Constants.NO_UNITS:
+							break;
+						case Constants.NO_MOUNT:
+						case Constants.GROUND_MOUNT:
+						case Constants.FLYING_MOUNT:
+							goodSpaceAndClass = mount == occupy;
+							break;
+						case Constants.AFFECT_MOUNTED:
+							goodSpaceAndClass = mount == Constants.GROUND_MOUNT || mount == Constants.FLYING_MOUNT;
+							break;
+						case Constants.AFFECT_GROUND_UNITS:
+							goodSpaceAndClass = mount == Constants.NO_MOUNT || mount == Constants.GROUND_MOUNT;
+							break;
+					}
+					
+					if(goodSpaceAndClass) {
+						//Add unit
+						Unit newEnemy = new Unit(posX, posY, toSpawn, Constants.ENEMY, pa);
+						
+						//TODO: random amount of level-ups
+						
+						boolean spawnEnemy = false;
+						//Pick weapon(s)
+						boolean weaponPicked = false;
+						int weaponTries = 0;
+						while(!weaponPicked) {
+							if(weaponTries > 10) {
+								break;
+							}
+							int[] weaponTypes = toSpawn.getEquipableWeapons();
+							int randType = (int)pa.random(weaponTypes.length);
+							int type = weaponTypes[randType];
+							
+							int wepDiff = (int)pa.random(wepDifficulty + 1);
+							ArrayList<Weapon> wepsRand = weapons.getRarityList(wepDiff);
+							List<Weapon> correctType = wepsRand.stream().filter(w -> w.getWeaponType() == type).collect(Collectors.toList());
+							
+							if(correctType.size() == 0) {
+								weaponTries++;
+								continue;
+							}
+							
+							int pickWeapon = (int)pa.random(correctType.size());
+							Weapon picked = correctType.get(pickWeapon);
+							newEnemy.equipWeapon(picked);
+							//Could allow additional weapons to be given, for now just basic
+							weaponPicked = true;
+							spawnEnemy = true;
+						}
+						if(spawnEnemy && weaponPicked) {
+							enemy.addUnit(newEnemy);
+							easyAccessMap[posX][posY] = newEnemy;
+							enemySpawnChance = BASE_ENEMY_SPAWN;
+							enemySpawnCooldown = COOLDOWN_ENEMY_SPAWN;
+						}
+						break;
+					}
+				}
+			}
+		}
+		else {
+			if(enemySpawnCooldown <= 0) {
+				enemySpawnChance += INC_ENEMY_SPAWN;
+			}
+			else {
+				enemySpawnCooldown -= 1;
+			}
+		}
 	}
 	
 	private Unit isPosUnit() {
@@ -434,10 +699,7 @@ public class Game {
 	public void endCurrentTurn() {
 		cancelSelection();
 		//Check win
-		int winState = getWinner();
-		if(winState != -1) {
-			System.out.println("Winner is: " + winState);
-		}
+		winState = getWinner();
 		
 		nextTurn();
 		
@@ -463,6 +725,8 @@ public class Game {
 			cam.updateGridPos(camNewTurnPos.x, camNewTurnPos.y);
 		}
 		
+		selectedUnitIndex = 0;
+		
 		openMenuState = NO_MENU;
 		playerMenu = null;
 		
@@ -483,7 +747,11 @@ public class Game {
 					}
 					//Unit cannot die from being on a trap tile, only be left with 1 health
 					if(currTile.isTrap()) {
-						int damage = u.getStats()[Constants.HP] * (currTile.getDamagePercent() / 100);
+						//TODO: Maybe change so flying units can get hurt by some traps
+						if(u.getAssignedClass().getMounted() == Constants.FLYING_MOUNT) {
+							continue;
+						}
+						int damage = (int)(u.getStats()[Constants.HP] * ((float)currTile.getDamagePercent() / 100));
 						if(damage > u.getHealthPoints()) {
 							damage = u.getHealthPoints() - 1;
 						}
@@ -498,6 +766,7 @@ public class Game {
 		if(turn == Constants.ENEMY) {
 			endCurrentTurn();
 		}
+		openMenuState = STATE_NEXT_TURN;
 	}
 	
 	public int getCurrentTurn() {
@@ -587,6 +856,13 @@ public class Game {
 								}
 								if(result.atkDied && teams.get(turn).hasLost()) {
 									endCurrentTurn();
+								}
+								
+								if(result.atkDied && result.atk.getTeam() == Constants.ENEMY) {
+									teams.get(result.def.getTeam()).addGold(100);
+								}
+								else if(result.defDied && result.def.getTeam() == Constants.ENEMY) {
+									teams.get(result.atk.getTeam()).addGold(100);
 								}
 								openMenuState = STATE_BATTLE;
 							}
@@ -695,9 +971,12 @@ public class Game {
 		int damageDef;
 		boolean x2Def = false;
 		
+		Tile atkTile = map.getTileAtPos(attack.getPos());
+		Tile defTile = map.getTileAtPos(defend.getPos());
+		
 		//Attacker
 		if(attack.getEquipped() != null) {
-			chanceToHitAtk = attack.getEquipped().getHitRate(); //Maybe alter this
+			chanceToHitAtk = attack.getEquipped().getHitRate() - defTile.getAvoidPercent();
 			critChanceAtk = (int) (attack.getEquipped().getCriticalRate() + 0.25 * attack.getStats()[Constants.DEX]);
 			if(attack.getEquipped().getWeaponType() == Constants.MAGIC) {
 				damageAtk = attack.getEquipped().getAttack() + attack.getStats()[Constants.MAG] - defend.getStats()[Constants.MDEF];
@@ -707,7 +986,7 @@ public class Game {
 				return new BattleObj(damageAtk, 0, chanceToHitAtk, x2Atk, false, 0, 0, 0, false);
 			}
 			else {
-				damageAtk = attack.getEquipped().getAttack() + attack.getStats()[Constants.STR] - defend.getStats()[Constants.DEF];
+				damageAtk = attack.getEquipped().getAttack() + attack.getStats()[Constants.STR] - (defend.getStats()[Constants.DEF] + defTile.getDefUp());
 			}
 			
 			if(attack.getStats()[Constants.SPD] >= (defend.getStats()[Constants.SPD] + 5)) {
@@ -732,13 +1011,13 @@ public class Game {
 		}
 		
 		if(defend.getEquipped() != null) {
-			chanceToHitDef = defend.getEquipped().getHitRate(); //Maybe alter this
+			chanceToHitDef = defend.getEquipped().getHitRate() - atkTile.getAvoidPercent(); //Maybe alter this
 			critChanceDef = (int) (defend.getEquipped().getCriticalRate() + 0.25 * defend.getStats()[Constants.DEX]);
 			if(defend.getEquipped().getWeaponType() == Constants.MAGIC) {
 				damageDef = defend.getEquipped().getAttack() + defend.getStats()[Constants.MAG] - attack.getStats()[Constants.MDEF];
 			}
 			else {
-				damageDef = defend.getEquipped().getAttack() + defend.getStats()[Constants.STR] - attack.getStats()[Constants.DEF];
+				damageDef = defend.getEquipped().getAttack() + defend.getStats()[Constants.STR] - (attack.getStats()[Constants.DEF] + atkTile.getDefUp());
 			}
 			
 			if(defend.getStats()[Constants.SPD] >= (attack.getStats()[Constants.SPD] + 5)) {
@@ -768,8 +1047,8 @@ public class Game {
 		result.atk = attack;
 		result.def = other;
 		
-		result.preStatsAtk = attack.getStats();
-		result.preStatsDef = other.getStats();
+		result.preStatsAtk = attack.getStats().clone();
+		result.preStatsDef = other.getStats().clone();
 		
 		BattleObj battleResult = getDamage(attack, other);
 		//Do initial attack
@@ -906,6 +1185,10 @@ public class Game {
 		selectState = SELECT_TRADE;
 		openMenuState = NO_MENU;
 	}
+	
+	public void addGold(int team) {
+		teams.get(team).addGold(100);
+	}
 
 	public void confirmTrade(Item item, int index) {
 		if(startedTrade) {
@@ -930,5 +1213,14 @@ public class Game {
 			startedTrade = true;
 			tradeMenu = new ItemMenu(pa, this, otherUnit, cam.getTransPos());
 		}
+	}
+	
+	public void showPurchaseMenu() {
+		openMenuState = STATE_BUY;
+		buyMenu = new PurchaseMenu(pa, teams.get(turn), cam.getTransPos(), this, classes, weapons, easyAccessMap, map);
+	}
+
+	public int getWinState() {
+		return winState;
 	}
 }

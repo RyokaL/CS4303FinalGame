@@ -115,11 +115,19 @@ public class Blacksmith {
 		return newCopy;
 	}
 	
+	public List<Weapon> getWeaponList() {
+		return weaponList.values().stream().collect(Collectors.toList());
+	}
+	
+	public List<UseItem> getItemList() {
+		return itemList.values().stream().collect(Collectors.toList());
+	}
+	
 	public Set<String> getWeaponNames() {
 		return weaponList.keySet();
 	}
 	
-	public Set<String> getItemName() {
+	public Set<String> getItemNames() {
 		return itemList.keySet();
 	}
 }

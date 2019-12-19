@@ -5,6 +5,7 @@ public final class Constants {
 	public static final int STATE_MAIN_MENU = 0;
 	public static final int STATE_POST_MAIN = 1;
 	public static final int STATE_GAME = 2;
+	public static final int STATE_END = 3;
 	
 	public static final int NO_MOUNT = 0;
 	public static final int GROUND_MOUNT = 1;
@@ -40,6 +41,8 @@ public final class Constants {
 	public static final int ENEMY = 4;
 	
 	public static final int[] TEAM_COLOURS = {0xFFe30000, 0xFF0000c9, 0xFF00c900, 0xFFf7f700, 0xFF7f009c, 0x00FFFFFF};
+	public static final String[] WEAPON_TYPES = {"Sword", "Lance", "Axe", "Bow", "Magic", "Heal", "Beast"};
+	public static final String[] STATS = {"HP", "Str" , "Mag", "Def", "MDef", "SPD", "DEX"};
 	
 	private Constants() {
 		throw new IllegalStateException();

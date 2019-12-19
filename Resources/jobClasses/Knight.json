@@ -9,7 +9,8 @@
 	"mounted" : 1,
 	"movement" : 6,
 	"weaponTypes" : [0, 1],
-	"baseStats" : [15, 5, 5, 5, 5, 5, 5],
+	"baseStats" : [20, 10, 5, 10, 3, 5, 7],
 	"upgradeStage" : 1,
-	"upgradeList": ["Kelpie Knight"]
+	"upgradeList": ["Kelpie Knight"],
+	"cost" : 0
 }

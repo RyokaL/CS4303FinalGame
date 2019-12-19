@@ -77,28 +77,28 @@ public class ItemMenu {
 		
 		equipped = unitInv.getEquipped();
 		if(equipped != null) {
-			equippedWeapon = new Button(pa.width/2 - 200, (0.1f) * pa.height, 200, 100, 255, 128, 255, equipped.getName(), pa);
+			equippedWeapon = new Button(pa.width/2 - 400, (0.1f) * pa.height, 400, 100, 255, 128, 255, equipped.getName(), pa);
 		}
 		else {
-			equippedWeapon = new Button(pa.width/2 - 200, (0.1f) * pa.height, 200, 100, 255, 128, 255,"<empty>", pa);
+			equippedWeapon = new Button(pa.width/2 - 400, (0.1f) * pa.height, 400, 100, 255, 128, 255,"<empty>", pa);
 		}
 	
 		if(noItems > 0) {
 			if(trade && noItems < Constants.MAX_INVENTORY) {
 				itemButtons = new Button[noItems + 1];
-				itemButtons[noItems] = new Button(pa.width/2 - 200, (0.3f + (noItems * 0.05f)) * pa.height, 200, 100, 255, 128, 255, "<empty>", pa);
+				itemButtons[noItems] = new Button(pa.width/2 - 400, (0.3f + (noItems * 0.05f)) * pa.height, 400, 100, 255, 128, 255, "<empty>", pa);
 			}
 			else {
 				itemButtons = new Button[noItems];
 			}
 			for(int i = 0; i < noItems; i++) {
-				itemButtons[i] = new Button(pa.width/2 - 200, (0.3f + (i * 0.05f)) * pa.height, 200, 100, 255, 128, 255, items[i].getName(), pa);
+				itemButtons[i] = new Button(pa.width/2 - 400, (0.3f + (i * 0.05f)) * pa.height, 400, 100, 255, 128, 255, items[i].getName(), pa);
 			}
 		}
 		else {
 			itemButtons = new Button[1];
 			noItems = 1;
-			itemButtons[0] = new Button(pa.width/2 - 200, (0.3f) * pa.height, 200, 100, 255, 128, 255, "<empty>", pa);
+			itemButtons[0] = new Button(pa.width/2 - 400, (0.3f) * pa.height, 400, 100, 255, 128, 255, "<empty>", pa);
 		}
 		selectedIndex = -1;
 		equippedWeapon.setHighlighted();
@@ -123,10 +123,10 @@ public class ItemMenu {
 			useString = "Use";
 		}
 		
-		actionButtons[ACTION_USE] = new Button(pa.width/2 + 200, (0.3f + (ACTION_USE * 0.05f)) * pa.height, 200, 100, 255, 128, 255, useString, pa);
-		actionButtons[ACTION_MOVE] = new Button(pa.width/2 + 200, (0.3f + (ACTION_MOVE) * 0.05f) * pa.height, 200, 100, 255, 128, 255, moveString, pa);
-		actionButtons[ACTION_DISCARD] = new Button(pa.width/2 + 200, (0.3f + (ACTION_DISCARD) * 0.05f) * pa.height, 200, 100, 255, 128, 255, "Discard", pa);
-		actionButtons[ACTION_BACK] = new Button(pa.width/2 + 200, (0.3f + (ACTION_BACK) * 0.05f) * pa.height, 200, 100, 255, 128, 255, "Back", pa);
+		actionButtons[ACTION_USE] = new Button(pa.width/2 + 400, (0.3f + (ACTION_USE * 0.05f)) * pa.height, 200, 100, 255, 128, 255, useString, pa);
+		actionButtons[ACTION_MOVE] = new Button(pa.width/2 + 400, (0.3f + (ACTION_MOVE) * 0.05f) * pa.height, 200, 100, 255, 128, 255, moveString, pa);
+		actionButtons[ACTION_DISCARD] = new Button(pa.width/2 + 400, (0.3f + (ACTION_DISCARD) * 0.05f) * pa.height, 200, 100, 255, 128, 255, "Discard", pa);
+		actionButtons[ACTION_BACK] = new Button(pa.width/2 + 400, (0.3f + (ACTION_BACK) * 0.05f) * pa.height, 200, 100, 255, 128, 255, "Back", pa);
 		
 		secondSelectedIndex = 0;
 		actionButtons[secondSelectedIndex].setHighlighted();
@@ -148,6 +148,13 @@ public class ItemMenu {
 			itemButtons[i].display();
 		}
 		equippedWeapon.display();
+		
+		if(selectedIndex == -1) {
+			displayItemInfo(equipped);
+		}
+		else {
+			displayItemInfo(items[selectedIndex]);
+		}
 		
 		pa.popMatrix();
 		
@@ -241,6 +248,19 @@ public class ItemMenu {
 				}
 			}
 		}
+	}
+	
+	private void displayItemInfo(Item item) {
+		if(item == null) {
+			return;
+		}
+		String display = item.toString();
+		pa.fill(0xCC000b69);
+		pa.rect(pa.width/2, 0.3f * pa.height, 300, 400);
+		pa.fill(255);
+		pa.textSize(14);
+		pa.text(display, pa.width/2 + 150, 0.3f * pa.height + 50);
+		pa.textSize(32);
 	}
 	
 	private void selectItem() {

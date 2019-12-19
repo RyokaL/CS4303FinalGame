@@ -1,10 +1,12 @@
 {
-	"name" : "Plains",
+	"name" : "Ruins",
 	"affectMove" : 0,
 	"affectedUnits" : -1,
 	"unitsCanOccupy" : 2,
 	"heal" : false,
 	"healPercent" : 0,
 	"trap" : false,
-	"damagePercent" : 0
+	"damagePercent" : 0,
+	"defUp": 0,
+	"avoidPercent": 10
 }

@@ -11,8 +11,8 @@ public class UnitBattleMenu {
 	private final int ACTION_BUTTONS = 4;
 	private final int ACTION_ATTACK = 0;
 	private final int ACTION_INV = 1;
-	private final int ACTION_TRADE = 2;
-	private final int ACTION_WAIT = 3;
+	private final int ACTION_TRADE = 3;
+	private final int ACTION_WAIT = 2;
 	
 	private Button[] actions;
 	private int selectedIndex = 0;

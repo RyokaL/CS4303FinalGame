@@ -15,6 +15,7 @@ public class UnitClass {
 	private int[] baseStats;
 	private int upgradeStage;
 	private String[] upgradeList;
+	private int cost;
 	//Maybe add abilities?
 	
 	public UnitClass(String name, String[] spriteFilePaths, int[] statGrowths, int mounted, int movement, int[] weaponTypes) {
@@ -76,5 +77,9 @@ public class UnitClass {
 	
 	public String[] getUpgradeList() {
 		return upgradeList;
+	}
+	
+	public int getCost() {
+		return cost;
 	}
 }

@@ -14,6 +14,8 @@ public class Tile {
 	private int healPercent;
 	private boolean trap;
 	private int damagePercent;
+	private int defUp;
+	private int avoidPercent;
 	
 	private transient String tileDetail = null;
 	
@@ -56,25 +58,25 @@ public class Tile {
 		details.append("Usable by ");
 		switch (unitsCanOccupy) {
 			case Constants.NO_UNITS:
-				details.append("no units.");
+				details.append("no units. \n");
 				break;
 			case Constants.NO_MOUNT:
-				details.append("non-mounted units only. ");
+				details.append("non-mounted units only. \n");
 				break;
 			case Constants.GROUND_MOUNT:
-				details.append("ground mounted units only. ");
+				details.append("ground mounted units only. \n");
 				break;
 			case Constants.FLYING_MOUNT:
-				details.append("flying units only. ");
+				details.append("flying units only. \n");
 				break;
 			case Constants.AFFECT_ALL:
-				details.append("all units. ");
+				details.append("all units. \n");
 				break;
 			case Constants.AFFECT_MOUNTED:
-				details.append("mounted units only. ");
+				details.append("mounted units only. \n");
 				break;
 			case Constants.AFFECT_GROUND_UNITS:
-				details.append("ground units only. ");
+				details.append("ground units only. \n");
 				break;
 		}
 		
@@ -88,31 +90,45 @@ public class Tile {
 				details.append("Ground mounted units suffer ");
 				break;
 			case Constants.FLYING_MOUNT:
-				details.append("flying units suffer ");
+				details.append("Flying units suffer ");
 				break;
 			case Constants.AFFECT_ALL:
-				details.append("all units suffer ");
+				details.append("All units suffer ");
 				break;
 			case Constants.AFFECT_MOUNTED:
-				details.append("mounted units suffer ");
+				details.append("Mounted units suffer ");
 				break;
 			case Constants.AFFECT_GROUND_UNITS:
-				details.append("ground units suffer ");
+				details.append("Ground units suffer ");
 				break;
 		}
 		if(!(affectedUnits == Constants.NO_UNITS)) {
-			details.append(affectMove + "movement.");
+			details.append(-affectMove + " movement.\n");
 		}
 		
 		if(heal) {
-			details.append("Units recieve " + healPercent + "% healing.");
+			details.append("Units recieve " + healPercent + "% healing.\n");
 		}
 		
 		if(trap) {
-			details.append("Units take " + damagePercent + "% damage.");
+			details.append("Units take " + damagePercent + "% damage.\n");
+		}
+		
+		if(defUp > 0) {
+			details.append("DEF +" + defUp + "  ");
+		}
+		
+		if(avoidPercent > 0) {
+			details.append("AVO +" + avoidPercent + "  ");
 		}
 		
 		tileDetail = details.toString();
 		return tileDetail;
+	}
+	public int getDefUp() {
+		return defUp;
+	}
+	public int getAvoidPercent() {
+		return avoidPercent;
 	}
 }

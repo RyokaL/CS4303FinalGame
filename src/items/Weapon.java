@@ -1,5 +1,7 @@
 package items;
 
+import constants.Constants;
+
 public class Weapon implements Item {
 	
 	private String name;
@@ -9,12 +11,14 @@ public class Weapon implements Item {
 	private int maxRange;
 	private int minRange;
 	private int durability;
+	private transient int maxDurability;
 	private boolean healing;
 	private int weaponType;
 	private int rarity;
+	private int cost;
 
 	public Weapon(String name, int attack, int hitRate, int critRate, int maxRange, int minRange, int durability,
-			boolean healing, int weaponType, int rarity) {
+			boolean healing, int weaponType, int rarity, int cost) {
 		this.name = name;
 		this.attack = attack;
 		this.hitRate = hitRate;
@@ -25,6 +29,8 @@ public class Weapon implements Item {
 		this.healing = healing;
 		this.weaponType = weaponType;
 		this.rarity = rarity;
+		this.cost = cost;
+		maxDurability = durability;
 	}
 	
 	public Weapon(Weapon toCopy) {
@@ -38,6 +44,12 @@ public class Weapon implements Item {
 		this.healing = toCopy.isHealing();
 		this.weaponType = toCopy.getWeaponType();
 		this.rarity = toCopy.getRarity();
+		this.cost = toCopy.getCost();
+		maxDurability = durability;
+	}
+
+	public int getCost() {
+		return cost;
 	}
 
 	public String getName() {
@@ -91,5 +103,15 @@ public class Weapon implements Item {
 	
 	public Weapon clone() throws CloneNotSupportedException {
 		return (Weapon) super.clone();
+	}
+	
+	public String toString() {
+		String info = name + "\n" + "Attack: " + attack + "\n" 
+				+ "Hit: " + hitRate + "%\n"
+				+ "Crit: " + critRate + "%\n"
+				+ "Range: " + minRange + "-" + maxRange +  "\n"
+				+ "Type: " + Constants.WEAPON_TYPES[weaponType] + "\n"
+				+ "Durability: " + durability + "/" + maxDurability;
+		return info;
 	}
 }

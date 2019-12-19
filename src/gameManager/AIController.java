@@ -3,6 +3,7 @@ package gameManager;
 import java.util.ArrayList;
 
 import helpers.BattleObj;
+import helpers.BattleResult;
 import helpers.EnemyMove;
 import helpers.Pair;
 import items.Item;
@@ -64,9 +65,7 @@ public class AIController {
 				currUnit.setMovePos(e.posToMove.x, e.posToMove.y);
 				BattleObj moveResult = game.getDamage(currUnit, easyAccessMap[e.posToAttack.x][e.posToAttack.y]);
 				float score = getUnitAttackScore(moveResult);
-				
-				System.out.println("[" + e.posToMove.x + " , " + e.posToMove.y + "], [" + e.posToAttack.x + " , " + e.posToAttack.y + "] :: " + e.currEquipIndex);
-				
+			
 				if(score > highestScoringSpace) {
 					highestScoringSpace = score;
 					bestMove = e;
@@ -82,7 +81,10 @@ public class AIController {
 					currUnit.removeFromInventory(bestMove.currEquipIndex);
 					currUnit.addToInventory(toReAdd);
 				}
-				game.attackUnit(currUnit, easyAccessMap[bestMove.posToAttack.x][bestMove.posToAttack.y], false);
+				BattleResult result = game.attackUnit(currUnit, easyAccessMap[bestMove.posToAttack.x][bestMove.posToAttack.y], false);
+				if(result.atkDied) {
+					game.addGold(result.def.getTeam());
+				}
 				//TODO: Show battle result menu
 				game.moveAndUpdateSelection(currUnit, bestMove.posToMove);
 				return;
@@ -116,9 +118,6 @@ public class AIController {
 				}
 				if(bestPos != null) {
 					game.moveAndUpdateSelection(currUnit, bestPos);
-				}
-				else {
-					System.out.println("wot");
 				}
 			}
 			else {

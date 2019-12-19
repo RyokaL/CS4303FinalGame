@@ -1,5 +1,5 @@
 {
-	"jobName" : "Tactician",
+	"jobName" : "TacticianBad",
 	"spritePaths" : ["Resources/sprites/Tactician/TacticianRed.png",
 					"Resources/sprites/Tactician/TacticianBlue.png",
 					"Resources/sprites/Tactician/TacticianGreen.png",
@@ -10,7 +10,6 @@
 	"movement" : 3,
 	"weaponTypes" : [0, 1, 2, 3, 4, 5],
 	"baseStats" : [15, 5, 5, 5, 5, 5, 5],
-	"upgradeStage" : -1,
-	"upgradeList": [],
-	"cost" : 100000
+	"upgradeStage" : 0,
+	"upgradeList": []
 }
