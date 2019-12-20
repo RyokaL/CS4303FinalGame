@@ -1,0 +1,13 @@
+{
+	"name" : "Dusty Book",
+	"attack" : 4,
+	"hitRate" : 100,
+	"critRate" : 1,
+	"maxRange" : 2,
+	"minRange" : 1,
+	"durability" : 10,
+	"healing" : false,
+	"weaponType" : 4,
+	"rarity" : 0,
+	"cost" : 50
+}

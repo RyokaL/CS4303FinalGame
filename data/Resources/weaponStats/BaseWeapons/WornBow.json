@@ -1,0 +1,13 @@
+{
+	"name" : "Worn Bow",
+	"attack" : 4,
+	"hitRate" : 100,
+	"critRate" : 5,
+	"maxRange" : 2,
+	"minRange" : 2,
+	"durability" : 10,
+	"healing" : false,
+	"weaponType" : 3,
+	"rarity" : 0,
+	"cost" : 60
+}

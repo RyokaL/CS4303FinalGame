@@ -172,6 +172,9 @@ public class Unit {
 			return false;
 		}
 		else {
+			if(inventorySize == -1) {
+				inventorySize += 1;
+			}
 			inventory[inventorySize] = toAdd;
 			inventorySize += 1;
 			return true;

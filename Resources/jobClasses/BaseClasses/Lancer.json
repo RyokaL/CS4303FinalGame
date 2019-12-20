@@ -1,0 +1,16 @@
+{
+	"jobName" : "Lancer",
+	"spritePaths" : ["Resources/sprites/Lancer/Red.png",
+					"Resources/sprites/Lancer/Blue.png",
+					"Resources/sprites/Lancer/Green.png",
+					"Resources/sprites/Lancer/Yellow.png",
+					"Resources/sprites/Lancer/Enemy.png"],
+	"statGrowths" : [15, 50, 5, 15, 5, 10, 30],
+	"mounted" : 0,
+	"movement" : 4,
+	"weaponTypes" : [1],
+	"baseStats" : [15, 10, 1, 4, 1, 3, 5],
+	"upgradeStage" : 1,
+	"upgradeList": [],
+	"cost" : 50
+}

@@ -1,0 +1,16 @@
+{
+	"jobName" : "Mercenary",
+	"spritePaths" : ["Resources/sprites/Mercenary/Red.png",
+					"Resources/sprites/Mercenary/Blue.png",
+					"Resources/sprites/Mercenary/Green.png",
+					"Resources/sprites/Mercenary/Yellow.png",
+					"Resources/sprites/Mercenary/Enemy.png"],
+	"statGrowths" : [15, 50, 5, 15, 5, 30, 10],
+	"mounted" : 0,
+	"movement" : 4,
+	"weaponTypes" : [0, 2],
+	"baseStats" : [15, 10, 1, 4, 1, 5, 3],
+	"upgradeStage" : 1,
+	"upgradeList": [],
+	"cost" : 50
+}

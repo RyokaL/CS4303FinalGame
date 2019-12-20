@@ -1,0 +1,16 @@
+{
+	"jobName" : "Chirurgeon",
+	"spritePaths" : ["Resources/sprites/Chirurgeon/Red.png",
+					"Resources/sprites/Chirurgeon/Blue.png",
+					"Resources/sprites/Chirurgeon/Green.png",
+					"Resources/sprites/Chirurgeon/Yellow.png",
+					"Resources/sprites/Chirurgeon/Enemy.png"],
+	"statGrowths" : [20, 3, 50, 3, 30, 10, 10],
+	"mounted" : 0,
+	"movement" : 4,
+	"weaponTypes" : [5],
+	"baseStats" : [15, 1, 10, 3, 10, 5, 5],
+	"upgradeStage" : 1,
+	"upgradeList": [],
+	"cost" : 75
+}

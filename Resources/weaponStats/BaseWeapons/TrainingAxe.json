@@ -1,0 +1,13 @@
+{
+	"name" : "Training Axe",
+	"attack" : 7,
+	"hitRate" : 80,
+	"critRate" : 1,
+	"maxRange" : 1,
+	"minRange" : 1,
+	"durability" : 10,
+	"healing" : false,
+	"weaponType" : 2,
+	"rarity" : 0,
+	"cost" : 50
+}

@@ -225,6 +225,33 @@ public class Game {
 			if(selectState == SELECT_ATTACK) {
 				if(selectedUnit.getEquipped() != null && selectedUnit.getEquipped().isHealing() && selected.getTeam() == selectedUnit.getTeam()) {
 					//TODO: display info on healing changes
+					if(showExtra) {
+						pa.pushMatrix();
+						PVector currTrans = cam.getTransPos();
+						pa.translate(-currTrans.x, -currTrans.y);
+						
+						pa.fill(255, 200);
+						pa.rect(3* pa.width/4, pa.height/2, 250, 250);
+						pa.fill(0, 200);
+						pa.rect(3* pa.width/4, pa.height/2 - 100, 250, 100);
+						
+						BattleObj damage = getDamage(selectedUnit, selected);
+						
+						pa.textAlign(PConstants.LEFT);
+						pa.fill(Constants.TEAM_COLOURS[selected.getTeam()]);
+						pa.text(selected.getAssignedClass().getName(), 3* pa.width/4, pa.height/2);
+						pa.fill(0);
+						String x2To = damage.x2To ? " x2" : "";
+						if(damage.damageTo < 0) {
+							pa.text("Heal Rec: " + (-damage.damageTo) + x2To, 3* pa.width/4, pa.height/2 + 50);
+						}
+						else {
+							pa.text("Dmg Rec: " + damage.damageTo + x2To, 3* pa.width/4, pa.height/2 + 50);
+						}
+						pa.text("Hit: " + damage.hitTo + "%", 3* pa.width/4, pa.height/2 + 100);
+						
+						pa.popMatrix();
+					}
 				}
 				else if(selected.getTeam() != selectedUnit.getTeam()) {
 					if(showExtra) {
@@ -245,25 +272,26 @@ public class Game {
 						BattleObj damage = getDamage(selectedUnit, selected);
 						
 						pa.textAlign(PConstants.LEFT);
-						pa.fill(255);
+						pa.fill(Constants.TEAM_COLOURS[selectedUnit.getTeam()]);
 						pa.text(selectedUnit.getAssignedClass().getName(), 2* pa.width/4, pa.height/2);
+						pa.fill(Constants.TEAM_COLOURS[selected.getTeam()]);
 						pa.text(selected.getAssignedClass().getName(), 3* pa.width/4, pa.height/2);
 						pa.fill(0);
 						if(damage.counter) {
 							String x2From = damage.x2From ? " x2" : "";
-							pa.text("Dmg: " + damage.damageFrom + x2From, 2* pa.width/4, pa.height/2 + 50);
-							pa.text("Hit: " + damage.hitFrom + "%", 3* pa.width/4, pa.height/2 + 100);
-							pa.text("Crit: " + damage.critFrom + "%", 3* pa.width/4, pa.height/2 + 150);
+							pa.text("Dmg Rec: " + damage.damageFrom + x2From, 2* pa.width/4, pa.height/2 + 50);
+							pa.text("Hit: " + damage.hitFrom + "%", 2* pa.width/4, pa.height/2 + 100);
+							pa.text("Crit: " + damage.critFrom + "%", 2* pa.width/4, pa.height/2 + 150);
 						}
 						String x2To = damage.x2To ? " x2" : "";
 						if(damage.damageTo < 0) {
-							pa.text("Heal: " + (-damage.damageTo) + x2To, 3* pa.width/4, pa.height/2 + 50);
+							pa.text("Heal Rec: " + (-damage.damageTo) + x2To, 3* pa.width/4, pa.height/2 + 50);
 						}
 						else {
-							pa.text("Dmg: " + damage.damageTo + x2To, 3* pa.width/4, pa.height/2 + 50);
+							pa.text("Dmg Rec: " + damage.damageTo + x2To, 3* pa.width/4, pa.height/2 + 50);
 						}
-						pa.text("Hit: " + damage.hitTo + "%", 2* pa.width/4, pa.height/2 + 100);
-						pa.text("Crit: " + damage.critTo + "%", 2* pa.width/4, pa.height/2 + 150);
+						pa.text("Hit: " + damage.hitTo + "%", 3* pa.width/4, pa.height/2 + 100);
+						pa.text("Crit: " + damage.critTo + "%", 3* pa.width/4, pa.height/2 + 150);
 						
 						pa.popMatrix();
 					}
@@ -288,7 +316,7 @@ public class Game {
 					pa.rect(3* pa.width/4, pa.height/2 - 100, 250, 100);
 					
 					pa.textAlign(PConstants.LEFT);
-					pa.fill(255);
+					pa.fill(Constants.TEAM_COLOURS[selected.getTeam()]);
 					pa.text(selected.getAssignedClass().getName(), 3* pa.width/4, pa.height/2);
 					pa.fill(0);
 					pa.text("Lv. "  + selected.getLevel(), 3* pa.width/4, pa.height/2 + 25);
@@ -480,6 +508,9 @@ public class Game {
 						List<Unit> toMove = current.getUnmovedUnits();
 						selectedUnitIndex -= 1;
 						if(selectedUnitIndex < 0) {
+							if(toMove.size() == 0) {
+								break;
+							}
 							selectedUnitIndex = toMove.size() - 1;
 						}
 						Pair next = toMove.get(selectedUnitIndex).getPos();
@@ -489,6 +520,9 @@ public class Game {
 						//Move to next unmoved unit
 						Player currentD = teams.get(turn);
 						List<Unit> toMoveD = currentD.getUnmovedUnits();
+						if(toMoveD.size() == 0) {
+							break;
+						}
 						selectedUnitIndex = (selectedUnitIndex + 1) % (toMoveD.size());
 						Pair nextD = toMoveD.get(selectedUnitIndex).getPos();
 						cam.updateGridPos(nextD.x, nextD.y);
@@ -762,6 +796,19 @@ public class Game {
 			//On every loop of turns try spawning more resources/enemies
 			spawnResources();
 			spawnEnemies();
+			
+			//Difficulty increase should and could be better, but time running out
+			if(pa.random(100) < 100) {
+				difficulty = (difficulty + 1);
+				if(difficulty >= classes.getMaxStrength()) {
+					difficulty = classes.getMaxStrength();
+				}
+				wepDifficulty = (wepDifficulty + 1);
+				if(wepDifficulty >= weapons.getMaxRarity()) {
+					wepDifficulty = weapons.getMaxRarity();
+				}
+			}
+			
 		}
 		if(turn == Constants.ENEMY) {
 			endCurrentTurn();
@@ -866,8 +913,8 @@ public class Game {
 								}
 								openMenuState = STATE_BATTLE;
 							}
-							if(toAttack.getTeam() == turn) {
-								if(toAttack.getEquipped() != null && toAttack.getEquipped().isHealing()) {
+							else if(toAttack.getTeam() == turn) {
+								if(selectedUnit.getEquipped() != null && selectedUnit.getEquipped().isHealing()) {
 									lastBattle = new BattleResultsMenu(pa, attackUnit(selectedUnit, toAttack, true), this);
 									selectState = SELECT_NORMAL;
 									moveAndUpdateSelection(selectedUnit, selectedUnit.getPos());

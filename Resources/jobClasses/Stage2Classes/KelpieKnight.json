@@ -5,11 +5,12 @@
 					"Resources/sprites/KelpieKnight/Green.png",
 					"Resources/sprites/KelpieKnight/Yellow.png",
 					"Resources/sprites/KelpieKnight/Enemy.png"],
-	"statGrowths" : [20, 20, 30, 15, 40, 20, 30],
+	"statGrowths" : [20, 20, 30, 15, 40, 30, 15],
 	"mounted" : 2,
 	"movement" : 7,
 	"weaponTypes" : [1, 3, 4],
-	"baseStats" : [15, 5, 5, 5, 5, 5, 5],
-	"upgradeStage" : 2,
-	"upgradeList": []
+	"baseStats" : [30, 10, 10, 10, 15, 5, 10],
+	"upgradeStage" : 3,
+	"upgradeList": [],
+	"cost" : 1000
 }

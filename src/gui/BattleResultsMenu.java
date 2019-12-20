@@ -170,7 +170,6 @@ public class BattleResultsMenu {
 		
 		if(pa.keyPressed) {
 			pa.keyPressed = false;
-			if(pa.key == 'q') {
 				if(levelUpAtk) {
 					levelUpAtk = false;
 					state = STATE_ATK_LEVEL;
@@ -183,6 +182,5 @@ public class BattleResultsMenu {
 					returnGame.cancelSelection();
 				}
 			}
-		}
 	}
 }

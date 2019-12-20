@@ -1,0 +1,16 @@
+{
+	"jobName" : "Archer",
+	"spritePaths" : ["Resources/sprites/Archer/Red.png",
+					"Resources/sprites/Archer/Blue.png",
+					"Resources/sprites/Archer/Green.png",
+					"Resources/sprites/Archer/Yellow.png",
+					"Resources/sprites/Archer/Enemy.png"],
+	"statGrowths" : [15, 30, 5, 10, 10, 25, 30],
+	"mounted" : 0,
+	"movement" : 4,
+	"weaponTypes" : [3],
+	"baseStats" : [15, 4, 3, 4, 4, 8, 10],
+	"upgradeStage" : 1,
+	"upgradeList": [],
+	"cost" : 50
+}

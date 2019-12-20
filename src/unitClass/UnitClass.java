@@ -1,5 +1,7 @@
 package unitClass;
 
+import java.io.File;
+
 import processing.core.PApplet;
 import processing.core.PImage;
 
@@ -28,10 +30,13 @@ public class UnitClass {
 		this.sprites = new PImage[4];
 	}
 	
-	public void loadSprites( final PApplet pa) {
+	public void loadSprites(final PApplet pa) {
 		this.sprites = new PImage[5];
 		for(int i = 0; i < 5; i++) {
-			sprites[i] = pa.loadImage(spritePaths[i]);
+			File tempFile = new File(spritePaths[i]);
+			if(tempFile.exists()) {
+				sprites[i] = pa.loadImage(pa.sketchPath(spritePaths[i]));
+			}
 		}
 	}
 

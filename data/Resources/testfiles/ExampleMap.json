@@ -1,0 +1,28 @@
+{
+	"name" : "Example Map",
+	"tileNames" : ["Plains","Plains"],
+	"mapPath" : "Resources/mapImages/TestMap.png",
+	"map" : [[1,1,1,1],
+			 [1,1,1,1],
+			 [1,1,1,1],
+			 [1,1,1,1]],
+	"mapStartPosX" : 0,
+	"mapStartPosY" : 0,
+	"tileSize" : 50,
+	"redStartPos" : {
+		"x" : 0,
+		"y" : 0
+	},
+	"blueStartPos" : {
+		"x" : 3,
+		"y" : 0
+	},
+	"greenStartPos" : {
+		"x" : 0,
+		"y" : 3
+	},
+	"yellowStartPos" : {
+		"x" : 3,
+		"y" : 3
+	}
+}

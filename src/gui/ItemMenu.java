@@ -243,7 +243,9 @@ public class ItemMenu {
 						if(trade) {
 							returnMenu.cancelSelection();
 						}
-						returnUMenu.back(false);
+						else {
+							returnUMenu.back(false);
+						}
 						break;
 				}
 			}

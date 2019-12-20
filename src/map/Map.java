@@ -298,7 +298,7 @@ public class Map {
 	}
 
 	public void loadMap(final PApplet pa) {
-		mapImg = pa.loadImage(mapPath);
+		mapImg = pa.loadImage(pa.sketchPath(mapPath));
 		fixMapRep();
 	}
 	

@@ -1,0 +1,16 @@
+{
+	"jobName" : "Knight",
+	"spritePaths" : ["Resources/sprites/Knight/Red.png",
+					"Resources/sprites/Knight/Blue.png",
+					"Resources/sprites/Knight/Green.png",
+					"Resources/sprites/Knight/Yellow.png",
+					"Resources/sprites/Knight/Enemy.png"],
+	"statGrowths" : [30, 25, 10, 25, 25, 25, 20],
+	"mounted" : 1,
+	"movement" : 6,
+	"weaponTypes" : [0, 1],
+	"baseStats" : [20, 10, 5, 10, 3, 5, 7],
+	"upgradeStage" : 2,
+	"upgradeList": ["Kelpie Knight"],
+	"cost" : 100
+}

@@ -1,0 +1,13 @@
+{
+	"name" : "Training Lance",
+	"attack" : 5,
+	"hitRate" : 90,
+	"critRate" : 1,
+	"maxRange" : 1,
+	"minRange" : 1,
+	"durability" : 10,
+	"healing" : false,
+	"weaponType" : 1,
+	"rarity" : 0,
+	"cost" : 50
+}

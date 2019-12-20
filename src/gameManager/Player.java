@@ -18,14 +18,14 @@ public class Player {
 	
 	public Player(int team, Unit initialUnit) {
 		this.team = team;
-		this.gold = 0;
+		this.gold = 100;
 		this.units = new ArrayList<Unit>();
 		this.units.add(initialUnit);
 	}
 	
 	public Player(int team) {
 		this.team = team;
-		this.gold = 0;
+		this.gold = 100;
 		this.units = new ArrayList<Unit>();
 	}
 	

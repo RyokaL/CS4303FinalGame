@@ -1,0 +1,16 @@
+{
+	"jobName" : "Mage",
+	"spritePaths" : ["Resources/sprites/Mage/Red.png",
+					"Resources/sprites/Mage/Blue.png",
+					"Resources/sprites/Mage/Green.png",
+					"Resources/sprites/Mage/Yellow.png",
+					"Resources/sprites/Mage/Enemy.png"],
+	"statGrowths" : [15, 5, 50, 5, 15, 10, 30],
+	"mounted" : 0,
+	"movement" : 4,
+	"weaponTypes" : [4],
+	"baseStats" : [15, 2, 7, 3, 8, 5, 5],
+	"upgradeStage" : 1,
+	"upgradeList": [],
+	"cost" : 50
+}

@@ -1,0 +1,28 @@
+{
+	"name" : "Example Map v2.",
+	"tileNames" : ["Forest","Plains"],
+	"mapPath" : "Resources/mapImages/TestMapBig.png",
+	"map" : [[1,1,1,1],
+			 [1,1,0,1],
+			 [1,1,1,1],
+			 [1,1,1,1]],
+	"mapStartPosX" : 500,
+	"mapStartPosY" : 500,
+	"tileSize" : 50,
+	"redStartPos" : {
+		"x" : 0,
+		"y" : 0
+	},
+	"blueStartPos" : {
+		"x" : 3,
+		"y" : 0
+	},
+	"greenStartPos" : {
+		"x" : 0,
+		"y" : 3
+	},
+	"yellowStartPos" : {
+		"x" : 3,
+		"y" : 3
+	}
+}

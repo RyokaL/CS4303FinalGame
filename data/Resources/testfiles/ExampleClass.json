@@ -1,0 +1,15 @@
+{
+	"jobName" : "Example Class",
+	"spritePaths" : ["Resources/sprites/ExampleClass/Red.png",
+					"Resources/sprites/ExampleClass/Blue.png",
+					"Resources/sprites/ExampleClass/Green.png",
+					"Resources/sprites/ExampleClass/Yellow.png",
+					"Resources/sprites/ExampleClass/Enemy.png"],
+	"statGrowths" : [25, 25, 25, 25, 25, 10, 10],
+	"mounted" : 0,
+	"movement" : 4,
+	"weaponTypes" : [0],
+	"baseStats" : [15, 5, 5, 5, 5, 5, 5],
+	"upgradeStage" : 0,
+	"upgradeList": []
+}

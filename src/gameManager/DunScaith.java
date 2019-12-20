@@ -38,17 +38,19 @@ public class DunScaith extends PApplet {
 
     //Set up variables etc
     public void setup(){
+		System.out.println(sketchPath("Resources/sprites/Archer/Red.png"));
+		loadImage(sketchPath("data/Resources/sprites/Archer/Red.png"));
         try {
 			classes = new ClassStore("Resources/jobClasses", this);
 			weapons = new Blacksmith("Resources/weaponStats", "Resources/useItems", this);
 			tiles = new TileSetStore("Resources/tiles", this);
 			maps = new MapStore("Resources/maps", this);
-		} catch (IOException e) {
+		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
     }
-
+    
     //Draw to screen
     public void draw() {
     	background(0);
